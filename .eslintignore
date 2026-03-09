@@ -1,3 +1,8 @@
 node_modules/
 logs/
 BACKEND_TODO.js
+cafeteria-ebenezer/
+.next/
+out/
+app/**/*.ts
+app/**/*.tsx

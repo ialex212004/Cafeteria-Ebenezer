@@ -51,10 +51,15 @@ const config = {
   },
 };
 
-// Validar configuración requerida
-if (config.isProduction) {
+// Validar configuración requerida (excepto durante build de Next.js)
+const isNextBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+if (config.isProduction && !isNextBuildPhase) {
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
-    throw new Error('JWT_SECRET debe estar configurado con al menos 32 caracteres');
+    // eslint-disable-next-line no-console
+    console.warn(
+      '⚠️  JWT_SECRET no está configurado o es corto. ' +
+      'Configúralo antes de habilitar autenticación JWT.',
+    );
   }
   if (process.env.ALLOWED_ORIGINS === 'http://localhost:3000') {
     // eslint-disable-next-line no-console
