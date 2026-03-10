@@ -31,7 +31,7 @@ const config = {
   logLevel: process.env.LOG_LEVEL || 'info',
 
   // Seguridad
-  jwtSecret: process.env.JWT_SECRET || 'dev-secret-key-change-in-production',
+  jwtSecret: process.env.JWT_SECRET,
   apiKey: process.env.API_KEY || 'dev-api-key',
 
   // Validación
