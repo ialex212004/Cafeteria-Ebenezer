@@ -25,3 +25,6 @@ next-env.d.ts
 # Sistema
 .idea/
 .cache/
+.next
+logs/
+data/
