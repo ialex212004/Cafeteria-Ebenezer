@@ -68,6 +68,14 @@ function mapResenaRow(row) {
   };
 }
 
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+}
+
 export async function GET(request) {
   const requestId = createRequestId();
   if (!hasValidAdminKey(request)) {
@@ -78,20 +86,35 @@ export async function GET(request) {
     );
   }
 
+  const { searchParams } = new URL(request.url);
+  const page = parsePositiveInt(searchParams.get('page') || '1', 1);
+  const limit = Math.min(parsePositiveInt(searchParams.get('limit') || '50', 50), 200);
+  const offset = (page - 1) * limit;
+
   const result = await query(
     `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
      FROM resenas
-     ORDER BY created_at DESC`,
+     ORDER BY created_at DESC
+     LIMIT $1 OFFSET $2`,
+    [limit, offset],
   );
 
   const data = result.rows.map(mapResenaRow);
-  const pendientes = data.filter(r => r.estado === 'pendiente').length;
+  const countResult = await query('SELECT COUNT(*)::int AS total FROM resenas');
+  const pendientesResult = await query(
+    'SELECT COUNT(*)::int AS pendientes FROM resenas WHERE aprobada = false',
+  );
+  const total = countResult.rows[0]?.total || 0;
+  const pendientes = pendientesResult.rows[0]?.pendientes || 0;
 
   return jsonWithRequestId(
     {
       error: false,
       data,
-      total: data.length,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit) || 1,
       pendientes,
       requestId,
     },

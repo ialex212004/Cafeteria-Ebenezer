@@ -116,6 +116,9 @@ router.post('/', createResenaLimiter, validateResena, async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const showAll = req.query.all === 'true';
+    const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+    const limit = Math.min(parseInt(req.query.limit || '50', 10), 200);
+    const offset = (page - 1) * limit;
 
     if (showAll && !hasValidAdminKey(req)) {
       return res.status(401).json({
@@ -125,17 +128,33 @@ router.get('/', async (req, res) => {
     }
 
     const resenasResult = showAll
-      ? await query('select * from resenas order by created_at desc')
-      : await query('select * from resenas where aprobada = true order by created_at desc');
+      ? await query('select * from resenas order by created_at desc limit $1 offset $2', [
+          limit,
+          offset,
+        ])
+      : await query(
+          'select * from resenas where aprobada = true order by created_at desc limit $1 offset $2',
+          [limit, offset],
+        );
 
     const resenas = resenasResult.rows.map(mapResena);
-    const pendientes = resenas.filter(r => r.estado === 'pendiente').length;
+    const totalResult = showAll
+      ? await query('select count(*)::int as total from resenas')
+      : await query('select count(*)::int as total from resenas where aprobada = true');
+    const total = totalResult.rows[0]?.total || 0;
+    const pendientesResult = showAll
+      ? await query('select count(*)::int as pendientes from resenas where aprobada = false')
+      : null;
+    const pendientes = pendientesResult ? pendientesResult.rows[0]?.pendientes || 0 : 0;
 
     if (showAll) {
       return res.json({
         error: false,
         data: resenas,
-        total: resenas.length,
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit) || 1,
         pendientes,
       });
     }
@@ -143,7 +162,10 @@ router.get('/', async (req, res) => {
     return res.json({
       error: false,
       data: resenas,
-      total: resenas.length,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit) || 1,
     });
   } catch (error) {
     logger.error('Error al obtener reseñas', { error: error.message });
@@ -160,14 +182,30 @@ router.get('/', async (req, res) => {
  */
 router.get('/todas', requireAdminAuth, async (req, res) => {
   try {
-    const resenasResult = await query('select * from resenas order by created_at desc');
+    const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+    const limit = Math.min(parseInt(req.query.limit || '50', 10), 200);
+    const offset = (page - 1) * limit;
+
+    const resenasResult = await query(
+      'select * from resenas order by created_at desc limit $1 offset $2',
+      [limit, offset],
+    );
     const resenas = resenasResult.rows.map(mapResena);
+    const totalResult = await query('select count(*)::int as total from resenas');
+    const pendientesResult = await query(
+      'select count(*)::int as pendientes from resenas where aprobada = false',
+    );
+    const total = totalResult.rows[0]?.total || 0;
+    const pendientes = pendientesResult.rows[0]?.pendientes || 0;
 
     res.json({
       error: false,
       data: resenas,
-      total: resenas.length,
-      pendientes: resenas.filter(r => r.estado === 'pendiente').length,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit) || 1,
+      pendientes,
     });
   } catch (error) {
     logger.error('Error al obtener todas las reseñas', { error: error.message });

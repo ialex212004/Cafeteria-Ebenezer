@@ -69,6 +69,14 @@ function mapResenaRow(row) {
   };
 }
 
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+}
+
 export async function POST(request) {
   const requestId = createRequestId();
   let body;
@@ -123,6 +131,9 @@ export async function GET(request) {
   const requestId = createRequestId();
   const { searchParams } = new URL(request.url);
   const showAll = searchParams.get('all') === 'true';
+  const page = parsePositiveInt(searchParams.get('page') || '1', 1);
+  const limit = Math.min(parsePositiveInt(searchParams.get('limit') || '50', 50), 200);
+  const offset = (page - 1) * limit;
 
   if (showAll) {
     if (!hasValidAdminKey(request)) {
@@ -136,17 +147,29 @@ export async function GET(request) {
     const result = await query(
       `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
        FROM resenas
-       ORDER BY created_at DESC`,
+       ORDER BY created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset],
     );
 
     const data = result.rows.map(mapResenaRow);
-    const pendientes = data.filter(r => r.estado === 'pendiente').length;
+    const countResult = await query(
+      'SELECT COUNT(*)::int AS total FROM resenas',
+    );
+    const pendientesResult = await query(
+      'SELECT COUNT(*)::int AS pendientes FROM resenas WHERE aprobada = false',
+    );
+    const total = countResult.rows[0]?.total || 0;
+    const pendientes = pendientesResult.rows[0]?.pendientes || 0;
 
     return jsonWithRequestId(
       {
         error: false,
         data,
-        total: data.length,
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit) || 1,
         pendientes,
         requestId,
       },
@@ -159,19 +182,30 @@ export async function GET(request) {
     `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
      FROM resenas
      WHERE aprobada = true
-     ORDER BY created_at DESC`,
+     ORDER BY created_at DESC
+     LIMIT $1 OFFSET $2`,
+    [limit, offset],
   );
 
   const data = result.rows.map(mapResenaRow);
+  const countResult = await query(
+    'SELECT COUNT(*)::int AS total FROM resenas WHERE aprobada = true',
+  );
+  const total = countResult.rows[0]?.total || 0;
 
-  return jsonWithRequestId(
+  const response = jsonWithRequestId(
     {
       error: false,
       data,
-      total: data.length,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit) || 1,
       requestId,
     },
     undefined,
     requestId,
   );
+  response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=300');
+  return response;
 }
