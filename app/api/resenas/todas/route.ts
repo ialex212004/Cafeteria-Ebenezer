@@ -1,10 +1,6 @@
-import path from 'path';
 import { NextResponse } from 'next/server';
 import config from '../../../../src/config/index.js';
-import dataManager from '../../../../src/utils/dataManager.js';
-
-const { readJSON } = dataManager;
-const RESENAS_FILE = path.join(config.dataDir, 'resenas.json');
+import { query } from '../../../../src/db/index.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,6 +19,44 @@ function hasValidAdminKey(request) {
   return false;
 }
 
+function parseComentario(comentario) {
+  if (!comentario) {
+    return { texto: '', ciudad: '' };
+  }
+  if (typeof comentario === 'object') {
+    return {
+      texto: comentario.texto || '',
+      ciudad: comentario.ciudad || '',
+    };
+  }
+  const trimmed = String(comentario).trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return {
+        texto: parsed.texto || '',
+        ciudad: parsed.ciudad || '',
+      };
+    } catch (_error) {
+      return { texto: trimmed, ciudad: '' };
+    }
+  }
+  return { texto: trimmed, ciudad: '' };
+}
+
+function mapResenaRow(row) {
+  const comentario = parseComentario(row.comentario);
+  return {
+    id: row.id,
+    nombre: row.nombre,
+    ciudad: comentario.ciudad || '',
+    texto: comentario.texto || '',
+    calificacion: row.calificacion ?? 5,
+    estado: row.aprobada ? 'publicada' : 'pendiente',
+    fechaCreacion: row.created_at ? row.created_at.toISOString() : null,
+  };
+}
+
 export async function GET(request) {
   if (!hasValidAdminKey(request)) {
     return NextResponse.json(
@@ -31,15 +65,19 @@ export async function GET(request) {
     );
   }
 
-  const resenas = readJSON(RESENAS_FILE);
-  const sorted = resenas.sort(
-    (a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion),
+  const result = await query(
+    `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
+     FROM resenas
+     ORDER BY created_at DESC`,
   );
+
+  const data = result.rows.map(mapResenaRow);
+  const pendientes = data.filter(r => r.estado === 'pendiente').length;
 
   return NextResponse.json({
     error: false,
-    data: sorted,
-    total: sorted.length,
-    pendientes: sorted.filter(r => r.estado === 'pendiente').length,
+    data,
+    total: data.length,
+    pendientes,
   });
 }

@@ -1,11 +1,7 @@
-import path from 'path';
 import { NextResponse } from 'next/server';
 import config from '../../../src/config/index.js';
-import dataManager from '../../../src/utils/dataManager.js';
+import { query } from '../../../src/db/index.js';
 import validators from '../../../src/validators/index.js';
-
-const { readJSON, writeJSON, getNextId } = dataManager;
-const PEDIDOS_FILE = path.join(config.dataDir, 'pedidos.json');
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +18,21 @@ function hasValidAdminKey(request) {
   }
 
   return false;
+}
+
+function mapPedidoRow(row) {
+  const rowItems = row.items || {};
+  return {
+    id: row.id,
+    nombre: row.cliente_nombre,
+    telefono: rowItems.telefono || '',
+    producto: rowItems.producto || '',
+    cantidad: rowItems.cantidad || 1,
+    notas: row.notas || '',
+    estado: row.estado,
+    fechaCreacion: row.created_at ? row.created_at.toISOString() : null,
+    fechaActualizacion: row.created_at ? row.created_at.toISOString() : null,
+  };
 }
 
 export async function POST(request) {
@@ -44,43 +55,49 @@ export async function POST(request) {
   }
 
   const { nombre, telefono, producto, cantidad, notas } = value;
-  const pedidos = readJSON(PEDIDOS_FILE);
 
-  const pedidoActivo = pedidos.find(
-    p => p.telefono === telefono && ['pendiente', 'confirmado'].includes(p.estado),
+  const existing = await query(
+    `SELECT id
+     FROM pedidos
+     WHERE estado IN ('pendiente', 'confirmado')
+       AND (items->>'telefono') = $1
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [telefono.trim()],
   );
 
-  if (pedidoActivo) {
+  if (existing.rows.length > 0) {
     return NextResponse.json(
       {
         error: true,
         message: 'Ya existe un pedido activo con este teléfono',
-        conflictId: pedidoActivo.id,
+        conflictId: existing.rows[0].id,
       },
       { status: 409 },
     );
   }
 
-  const pedido = {
-    id: getNextId(pedidos),
-    nombre: nombre.trim(),
-    telefono: telefono.trim(),
+  const items = {
     producto: producto.trim(),
     cantidad: cantidad || 1,
-    notas: (notas || '').trim(),
-    estado: 'pendiente',
-    fechaCreacion: new Date().toISOString(),
-    fechaActualizacion: new Date().toISOString(),
+    telefono: telefono.trim(),
   };
 
-  pedidos.push(pedido);
-  const success = writeJSON(PEDIDOS_FILE, pedidos);
-  if (!success) {
-    return NextResponse.json(
-      { error: true, message: 'Error al guardar el pedido' },
-      { status: 500 },
-    );
-  }
+  const insertResult = await query(
+    `INSERT INTO pedidos (cliente_nombre, cliente_email, items, total, estado, notas)
+     VALUES ($1, $2, $3::jsonb, $4, $5, $6)
+     RETURNING id, cliente_nombre, items, total, estado, notas, created_at`,
+    [
+      nombre.trim(),
+      null,
+      JSON.stringify(items),
+      0,
+      'pendiente',
+      (notas || '').trim(),
+    ],
+  );
+
+  const pedido = mapPedidoRow(insertResult.rows[0]);
 
   return NextResponse.json(
     {
@@ -100,39 +117,54 @@ export async function GET(request) {
     );
   }
 
-  let pedidos = readJSON(PEDIDOS_FILE);
   const { searchParams } = new URL(request.url);
+  const estadosValidos = ['pendiente', 'confirmado', 'entregado'];
+  let estadoFiltro = null;
 
   if (searchParams.get('estado')) {
-    const estadoFiltro = searchParams.get('estado').toLowerCase();
-    const estadosValidos = ['pendiente', 'confirmado', 'entregado'];
-
-    if (!estadosValidos.includes(estadoFiltro)) {
+    const estado = searchParams.get('estado').toLowerCase();
+    if (!estadosValidos.includes(estado)) {
       return NextResponse.json(
         { error: true, message: `Estado inválido. Usa: ${estadosValidos.join(', ')}` },
         { status: 400 },
       );
     }
-
-    pedidos = pedidos.filter(p => p.estado === estadoFiltro);
+    estadoFiltro = estado;
   }
-
-  const sorted = pedidos.sort(
-    (a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion),
-  );
 
   const page = Number.parseInt(searchParams.get('page') || '1', 10);
   const limit = Number.parseInt(searchParams.get('limit') || '50', 10);
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginated = sorted.slice(start, end);
+  const offset = (page - 1) * limit;
+
+  const whereClause = estadoFiltro ? 'WHERE estado = $1' : '';
+  const params = estadoFiltro ? [estadoFiltro, limit, offset] : [limit, offset];
+  const paramOffset = estadoFiltro ? 2 : 1;
+
+  const dataResult = await query(
+    `SELECT id, cliente_nombre, items, total, estado, notas, created_at
+     FROM pedidos
+     ${whereClause}
+     ORDER BY created_at DESC
+     LIMIT $${paramOffset} OFFSET $${paramOffset + 1}`,
+    params,
+  );
+
+  const countResult = await query(
+    `SELECT COUNT(*)::int AS total
+     FROM pedidos
+     ${whereClause}`,
+    estadoFiltro ? [estadoFiltro] : [],
+  );
+
+  const total = countResult.rows[0]?.total || 0;
+  const data = dataResult.rows.map(mapPedidoRow);
 
   return NextResponse.json({
     error: false,
-    data: paginated,
-    total: sorted.length,
+    data,
+    total,
     page,
     limit,
-    pages: Math.ceil(sorted.length / limit),
+    pages: Math.ceil(total / limit),
   });
 }

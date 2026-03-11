@@ -1,10 +1,6 @@
-import path from 'path';
 import { NextResponse } from 'next/server';
 import config from '../../../../src/config/index.js';
-import dataManager from '../../../../src/utils/dataManager.js';
-
-const { readJSON, writeJSON } = dataManager;
-const RESENAS_FILE = path.join(config.dataDir, 'resenas.json');
+import { query } from '../../../../src/db/index.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,12 +19,54 @@ function hasValidAdminKey(request) {
   return false;
 }
 
+function parseComentario(comentario) {
+  if (!comentario) {
+    return { texto: '', ciudad: '' };
+  }
+  if (typeof comentario === 'object') {
+    return {
+      texto: comentario.texto || '',
+      ciudad: comentario.ciudad || '',
+    };
+  }
+  const trimmed = String(comentario).trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return {
+        texto: parsed.texto || '',
+        ciudad: parsed.ciudad || '',
+      };
+    } catch (_error) {
+      return { texto: trimmed, ciudad: '' };
+    }
+  }
+  return { texto: trimmed, ciudad: '' };
+}
+
+function mapResenaRow(row) {
+  const comentario = parseComentario(row.comentario);
+  return {
+    id: row.id,
+    nombre: row.nombre,
+    ciudad: comentario.ciudad || '',
+    texto: comentario.texto || '',
+    calificacion: row.calificacion ?? 5,
+    estado: row.aprobada ? 'publicada' : 'pendiente',
+    fechaCreacion: row.created_at ? row.created_at.toISOString() : null,
+  };
+}
+
 export async function GET(_request, { params }) {
   const id = Number(params.id);
-  const resenas = readJSON(RESENAS_FILE);
-  const resena = resenas.find(r => r.id === id);
+  const result = await query(
+    `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
+     FROM resenas
+     WHERE id = $1`,
+    [id],
+  );
 
-  if (!resena) {
+  if (result.rows.length === 0) {
     return NextResponse.json(
       { error: true, message: 'Reseña no encontrada' },
       { status: 404 },
@@ -37,7 +75,7 @@ export async function GET(_request, { params }) {
 
   return NextResponse.json({
     error: false,
-    data: resena,
+    data: mapResenaRow(result.rows[0]),
   });
 }
 
@@ -68,26 +106,25 @@ export async function PATCH(request, { params }) {
   }
 
   const id = Number(params.id);
-  const resenas = readJSON(RESENAS_FILE);
-  const resena = resenas.find(r => r.id === id);
+  const aprobada = estado === 'publicada';
 
-  if (!resena) {
+  const updateResult = await query(
+    `UPDATE resenas
+     SET aprobada = $1
+     WHERE id = $2
+     RETURNING id, nombre, email, calificacion, comentario, aprobada, created_at`,
+    [aprobada, id],
+  );
+
+  if (updateResult.rows.length === 0) {
     return NextResponse.json(
       { error: true, message: 'Reseña no encontrada' },
       { status: 404 },
     );
   }
 
+  const resena = mapResenaRow(updateResult.rows[0]);
   resena.estado = estado;
-  resena.fechaActualizacion = new Date().toISOString();
-
-  const success = writeJSON(RESENAS_FILE, resenas);
-  if (!success) {
-    return NextResponse.json(
-      { error: true, message: 'Error al actualizar la reseña' },
-      { status: 500 },
-    );
-  }
 
   return NextResponse.json({
     error: false,
@@ -105,22 +142,17 @@ export async function DELETE(request, { params }) {
   }
 
   const id = Number(params.id);
-  const resenas = readJSON(RESENAS_FILE);
-  const index = resenas.findIndex(r => r.id === id);
+  const deleteResult = await query(
+    `DELETE FROM resenas
+     WHERE id = $1
+     RETURNING id`,
+    [id],
+  );
 
-  if (index === -1) {
+  if (deleteResult.rows.length === 0) {
     return NextResponse.json(
       { error: true, message: 'Reseña no encontrada' },
       { status: 404 },
-    );
-  }
-
-  resenas.splice(index, 1);
-  const success = writeJSON(RESENAS_FILE, resenas);
-  if (!success) {
-    return NextResponse.json(
-      { error: true, message: 'Error al eliminar la reseña' },
-      { status: 500 },
     );
   }
 

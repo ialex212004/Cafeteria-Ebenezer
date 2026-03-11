@@ -1,11 +1,7 @@
-import path from 'path';
 import { NextResponse } from 'next/server';
 import config from '../../../src/config/index.js';
-import dataManager from '../../../src/utils/dataManager.js';
+import { query } from '../../../src/db/index.js';
 import validators from '../../../src/validators/index.js';
-
-const { readJSON, writeJSON, getNextId } = dataManager;
-const RESENAS_FILE = path.join(config.dataDir, 'resenas.json');
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +18,44 @@ function hasValidAdminKey(request) {
   }
 
   return false;
+}
+
+function parseComentario(comentario) {
+  if (!comentario) {
+    return { texto: '', ciudad: '' };
+  }
+  if (typeof comentario === 'object') {
+    return {
+      texto: comentario.texto || '',
+      ciudad: comentario.ciudad || '',
+    };
+  }
+  const trimmed = String(comentario).trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return {
+        texto: parsed.texto || '',
+        ciudad: parsed.ciudad || '',
+      };
+    } catch (_error) {
+      return { texto: trimmed, ciudad: '' };
+    }
+  }
+  return { texto: trimmed, ciudad: '' };
+}
+
+function mapResenaRow(row) {
+  const comentario = parseComentario(row.comentario);
+  return {
+    id: row.id,
+    nombre: row.nombre,
+    ciudad: comentario.ciudad || '',
+    texto: comentario.texto || '',
+    calificacion: row.calificacion ?? 5,
+    estado: row.aprobada ? 'publicada' : 'pendiente',
+    fechaCreacion: row.created_at ? row.created_at.toISOString() : null,
+  };
 }
 
 export async function POST(request) {
@@ -44,25 +78,19 @@ export async function POST(request) {
   }
 
   const { nombre, ciudad, texto } = value;
-  const resenas = readJSON(RESENAS_FILE);
-  const resena = {
-    id: getNextId(resenas),
-    nombre: nombre.trim(),
-    ciudad: (ciudad || '').trim(),
+  const comentarioPayload = {
     texto: texto.trim(),
-    calificacion: 5,
-    estado: 'pendiente',
-    fechaCreacion: new Date().toISOString(),
+    ciudad: (ciudad || '').trim(),
   };
 
-  resenas.push(resena);
-  const success = writeJSON(RESENAS_FILE, resenas);
-  if (!success) {
-    return NextResponse.json(
-      { error: true, message: 'Error al guardar la reseña' },
-      { status: 500 },
-    );
-  }
+  const insertResult = await query(
+    `INSERT INTO resenas (nombre, email, calificacion, comentario, aprobada)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, nombre, email, calificacion, comentario, aprobada, created_at`,
+    [nombre.trim(), null, 5, JSON.stringify(comentarioPayload), false],
+  );
+
+  const resena = mapResenaRow(insertResult.rows[0]);
 
   return NextResponse.json(
     {
@@ -75,7 +103,6 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
-  const resenas = readJSON(RESENAS_FILE);
   const { searchParams } = new URL(request.url);
   const showAll = searchParams.get('all') === 'true';
 
@@ -87,26 +114,35 @@ export async function GET(request) {
       );
     }
 
-    const sortedAll = resenas.sort(
-      (a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion),
+    const result = await query(
+      `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
+       FROM resenas
+       ORDER BY created_at DESC`,
     );
+
+    const data = result.rows.map(mapResenaRow);
+    const pendientes = data.filter(r => r.estado === 'pendiente').length;
 
     return NextResponse.json({
       error: false,
-      data: sortedAll,
-      total: sortedAll.length,
-      pendientes: sortedAll.filter(r => r.estado === 'pendiente').length,
+      data,
+      total: data.length,
+      pendientes,
     });
   }
 
-  const filtered = resenas.filter(r => r.estado === 'publicada');
-  const sorted = filtered.sort(
-    (a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion),
+  const result = await query(
+    `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
+     FROM resenas
+     WHERE aprobada = true
+     ORDER BY created_at DESC`,
   );
+
+  const data = result.rows.map(mapResenaRow);
 
   return NextResponse.json({
     error: false,
-    data: sorted,
-    total: sorted.length,
+    data,
+    total: data.length,
   });
 }
