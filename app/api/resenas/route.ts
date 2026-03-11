@@ -2,9 +2,18 @@ import { NextResponse } from 'next/server';
 import config from '../../../src/config/index.js';
 import { query } from '../../../src/db/index.js';
 import validators from '../../../src/validators/index.js';
+import requestIdUtils from '../../../src/utils/requestId.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const { createRequestId } = requestIdUtils;
+
+function jsonWithRequestId(payload, init, requestId) {
+  const response = NextResponse.json(payload, init);
+  response.headers.set('X-Request-Id', requestId);
+  return response;
+}
 
 function hasValidAdminKey(request) {
   const directKey = request.headers.get('x-api-key');
@@ -59,21 +68,24 @@ function mapResenaRow(row) {
 }
 
 export async function POST(request) {
+  const requestId = createRequestId();
   let body;
   try {
     body = await request.json();
   } catch (_error) {
-    return NextResponse.json(
-      { error: true, message: 'JSON inválido' },
+    return jsonWithRequestId(
+      { error: true, message: 'JSON inválido', requestId },
       { status: 400 },
+      requestId,
     );
   }
 
   const { valid, value, error } = validators.validate(validators.schemas.resena, body);
   if (!valid) {
-    return NextResponse.json(
-      { error: true, message: 'Datos inválidos', details: error },
+    return jsonWithRequestId(
+      { error: true, message: 'Datos inválidos', details: error, requestId },
       { status: 400 },
+      requestId,
     );
   }
 
@@ -92,25 +104,29 @@ export async function POST(request) {
 
   const resena = mapResenaRow(insertResult.rows[0]);
 
-  return NextResponse.json(
+  return jsonWithRequestId(
     {
       error: false,
       message: 'Reseña creada exitosamente',
       data: resena,
+      requestId,
     },
     { status: 201 },
+    requestId,
   );
 }
 
 export async function GET(request) {
+  const requestId = createRequestId();
   const { searchParams } = new URL(request.url);
   const showAll = searchParams.get('all') === 'true';
 
   if (showAll) {
     if (!hasValidAdminKey(request)) {
-      return NextResponse.json(
-        { error: true, message: 'No autorizado. API key inválida o ausente.' },
+      return jsonWithRequestId(
+        { error: true, message: 'No autorizado. API key inválida o ausente.', requestId },
         { status: 401 },
+        requestId,
       );
     }
 
@@ -123,12 +139,17 @@ export async function GET(request) {
     const data = result.rows.map(mapResenaRow);
     const pendientes = data.filter(r => r.estado === 'pendiente').length;
 
-    return NextResponse.json({
-      error: false,
-      data,
-      total: data.length,
-      pendientes,
-    });
+    return jsonWithRequestId(
+      {
+        error: false,
+        data,
+        total: data.length,
+        pendientes,
+        requestId,
+      },
+      undefined,
+      requestId,
+    );
   }
 
   const result = await query(
@@ -140,9 +161,14 @@ export async function GET(request) {
 
   const data = result.rows.map(mapResenaRow);
 
-  return NextResponse.json({
-    error: false,
-    data,
-    total: data.length,
-  });
+  return jsonWithRequestId(
+    {
+      error: false,
+      data,
+      total: data.length,
+      requestId,
+    },
+    undefined,
+    requestId,
+  );
 }

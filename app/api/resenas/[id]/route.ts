@@ -1,9 +1,18 @@
 import { NextResponse } from 'next/server';
 import config from '../../../../src/config/index.js';
 import { query } from '../../../../src/db/index.js';
+import requestIdUtils from '../../../../src/utils/requestId.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const { createRequestId } = requestIdUtils;
+
+function jsonWithRequestId(payload, init, requestId) {
+  const response = NextResponse.json(payload, init);
+  response.headers.set('X-Request-Id', requestId);
+  return response;
+}
 
 function hasValidAdminKey(request) {
   const directKey = request.headers.get('x-api-key');
@@ -58,6 +67,7 @@ function mapResenaRow(row) {
 }
 
 export async function GET(_request, { params }) {
+  const requestId = createRequestId();
   const id = Number(params.id);
   const result = await query(
     `SELECT id, nombre, email, calificacion, comentario, aprobada, created_at
@@ -67,23 +77,27 @@ export async function GET(_request, { params }) {
   );
 
   if (result.rows.length === 0) {
-    return NextResponse.json(
-      { error: true, message: 'Reseña no encontrada' },
+    return jsonWithRequestId(
+      { error: true, message: 'Reseña no encontrada', requestId },
       { status: 404 },
+      requestId,
     );
   }
 
-  return NextResponse.json({
-    error: false,
-    data: mapResenaRow(result.rows[0]),
-  });
+  return jsonWithRequestId(
+    { error: false, data: mapResenaRow(result.rows[0]), requestId },
+    undefined,
+    requestId,
+  );
 }
 
 export async function PATCH(request, { params }) {
+  const requestId = createRequestId();
   if (!hasValidAdminKey(request)) {
-    return NextResponse.json(
-      { error: true, message: 'No autorizado. API key inválida o ausente.' },
+    return jsonWithRequestId(
+      { error: true, message: 'No autorizado. API key inválida o ausente.', requestId },
       { status: 401 },
+      requestId,
     );
   }
 
@@ -91,17 +105,19 @@ export async function PATCH(request, { params }) {
   try {
     body = await request.json();
   } catch (_error) {
-    return NextResponse.json(
-      { error: true, message: 'JSON inválido' },
+    return jsonWithRequestId(
+      { error: true, message: 'JSON inválido', requestId },
       { status: 400 },
+      requestId,
     );
   }
 
   const { estado } = body;
   if (!['publicada', 'rechazada', 'pendiente'].includes(estado)) {
-    return NextResponse.json(
-      { error: true, message: 'Estado inválido. Usa: publicada, rechazada o pendiente' },
+    return jsonWithRequestId(
+      { error: true, message: 'Estado inválido. Usa: publicada, rechazada o pendiente', requestId },
       { status: 400 },
+      requestId,
     );
   }
 
@@ -117,27 +133,35 @@ export async function PATCH(request, { params }) {
   );
 
   if (updateResult.rows.length === 0) {
-    return NextResponse.json(
-      { error: true, message: 'Reseña no encontrada' },
+    return jsonWithRequestId(
+      { error: true, message: 'Reseña no encontrada', requestId },
       { status: 404 },
+      requestId,
     );
   }
 
   const resena = mapResenaRow(updateResult.rows[0]);
   resena.estado = estado;
 
-  return NextResponse.json({
-    error: false,
-    message: 'Reseña actualizada exitosamente',
-    data: resena,
-  });
+  return jsonWithRequestId(
+    {
+      error: false,
+      message: 'Reseña actualizada exitosamente',
+      data: resena,
+      requestId,
+    },
+    undefined,
+    requestId,
+  );
 }
 
 export async function DELETE(request, { params }) {
+  const requestId = createRequestId();
   if (!hasValidAdminKey(request)) {
-    return NextResponse.json(
-      { error: true, message: 'No autorizado. API key inválida o ausente.' },
+    return jsonWithRequestId(
+      { error: true, message: 'No autorizado. API key inválida o ausente.', requestId },
       { status: 401 },
+      requestId,
     );
   }
 
@@ -150,14 +174,20 @@ export async function DELETE(request, { params }) {
   );
 
   if (deleteResult.rows.length === 0) {
-    return NextResponse.json(
-      { error: true, message: 'Reseña no encontrada' },
+    return jsonWithRequestId(
+      { error: true, message: 'Reseña no encontrada', requestId },
       { status: 404 },
+      requestId,
     );
   }
 
-  return NextResponse.json({
-    error: false,
-    message: 'Reseña eliminada exitosamente',
-  });
+  return jsonWithRequestId(
+    {
+      error: false,
+      message: 'Reseña eliminada exitosamente',
+      requestId,
+    },
+    undefined,
+    requestId,
+  );
 }

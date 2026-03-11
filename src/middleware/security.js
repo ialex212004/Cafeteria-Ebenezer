@@ -5,6 +5,7 @@
 const cors = require('cors');
 const config = require('../config');
 const logger = require('../utils/logger')('Security');
+const { createRequestId } = require('../utils/requestId');
 
 /**
  * Configuración CORS personalizada
@@ -21,7 +22,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-Request-Id'],
   maxAge: 86400, // 24 horas
 };
 
@@ -56,6 +57,17 @@ const securityHeaders = (req, res, next) => {
 };
 
 /**
+ * Middleware de request id
+ */
+const requestId = (req, res, next) => {
+  const incomingId = req.headers['x-request-id'];
+  const id = (Array.isArray(incomingId) ? incomingId[0] : incomingId) || createRequestId();
+  req.requestId = String(id);
+  res.setHeader('X-Request-Id', req.requestId);
+  next();
+};
+
+/**
  * Middleware para logging de requests
  */
 const requestLogger = (req, res, next) => {
@@ -68,6 +80,7 @@ const requestLogger = (req, res, next) => {
       status: res.statusCode,
       duration: `${duration}ms`,
       ip: req.ip,
+      requestId: req.requestId,
     });
   });
 
@@ -77,5 +90,6 @@ const requestLogger = (req, res, next) => {
 module.exports = {
   cors: cors(corsOptions),
   securityHeaders,
+  requestId,
   requestLogger,
 };

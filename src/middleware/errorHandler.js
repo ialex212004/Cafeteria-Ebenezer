@@ -13,6 +13,7 @@ const errorHandler = (err, req, res, _next) => {
     stack: err.stack,
     path: req.path,
     method: req.method,
+    requestId: req.requestId,
   });
 
   const statusCode = err.status || 500;
@@ -21,6 +22,7 @@ const errorHandler = (err, req, res, _next) => {
   res.status(statusCode).json({
     error: true,
     message,
+    requestId: req.requestId,
     ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   });
 };
@@ -32,6 +34,7 @@ const notFound = (req, res, _next) => {
   res.status(404).json({
     error: true,
     message: `Ruta no encontrada: ${req.originalUrl}`,
+    requestId: req.requestId,
   });
 };
 

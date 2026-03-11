@@ -11,7 +11,7 @@ const config = require('./src/config');
 const logger = require('./src/utils/logger')('Server');
 
 // Middleware
-const { cors, securityHeaders, requestLogger } = require('./src/middleware/security');
+const { cors, securityHeaders, requestId, requestLogger } = require('./src/middleware/security');
 const { apiLimiter } = require('./src/middleware/rateLimiter');
 const { errorHandler, notFound } = require('./src/middleware/errorHandler');
 
@@ -25,6 +25,7 @@ function createApp() {
   const app = express();
 
   // ── MIDDLEWARES GLOBALES ────────────────────────────────
+  app.use(requestId);
   app.use(securityHeaders);
   app.use(cors);
   app.use(requestLogger);

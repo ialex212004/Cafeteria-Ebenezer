@@ -2,9 +2,18 @@ import { NextResponse } from 'next/server';
 import config from '../../../src/config/index.js';
 import { query } from '../../../src/db/index.js';
 import validators from '../../../src/validators/index.js';
+import requestIdUtils from '../../../src/utils/requestId.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const { createRequestId } = requestIdUtils;
+
+function jsonWithRequestId(payload, init, requestId) {
+  const response = NextResponse.json(payload, init);
+  response.headers.set('X-Request-Id', requestId);
+  return response;
+}
 
 function hasValidAdminKey(request) {
   const directKey = request.headers.get('x-api-key');
@@ -36,21 +45,24 @@ function mapPedidoRow(row) {
 }
 
 export async function POST(request) {
+  const requestId = createRequestId();
   let body;
   try {
     body = await request.json();
   } catch (_error) {
-    return NextResponse.json(
-      { error: true, message: 'JSON inválido' },
+    return jsonWithRequestId(
+      { error: true, message: 'JSON inválido', requestId },
       { status: 400 },
+      requestId,
     );
   }
 
   const { valid, value, error } = validators.validate(validators.schemas.pedido, body);
   if (!valid) {
-    return NextResponse.json(
-      { error: true, message: 'Datos inválidos', details: error },
+    return jsonWithRequestId(
+      { error: true, message: 'Datos inválidos', details: error, requestId },
       { status: 400 },
+      requestId,
     );
   }
 
@@ -67,13 +79,15 @@ export async function POST(request) {
   );
 
   if (existing.rows.length > 0) {
-    return NextResponse.json(
+    return jsonWithRequestId(
       {
         error: true,
         message: 'Ya existe un pedido activo con este teléfono',
         conflictId: existing.rows[0].id,
+        requestId,
       },
       { status: 409 },
+      requestId,
     );
   }
 
@@ -99,21 +113,25 @@ export async function POST(request) {
 
   const pedido = mapPedidoRow(insertResult.rows[0]);
 
-  return NextResponse.json(
+  return jsonWithRequestId(
     {
       error: false,
       message: 'Pedido creado exitosamente',
       data: pedido,
+      requestId,
     },
     { status: 201 },
+    requestId,
   );
 }
 
 export async function GET(request) {
+  const requestId = createRequestId();
   if (!hasValidAdminKey(request)) {
-    return NextResponse.json(
-      { error: true, message: 'No autorizado. API key inválida o ausente.' },
+    return jsonWithRequestId(
+      { error: true, message: 'No autorizado. API key inválida o ausente.', requestId },
       { status: 401 },
+      requestId,
     );
   }
 
@@ -124,9 +142,10 @@ export async function GET(request) {
   if (searchParams.get('estado')) {
     const estado = searchParams.get('estado').toLowerCase();
     if (!estadosValidos.includes(estado)) {
-      return NextResponse.json(
-        { error: true, message: `Estado inválido. Usa: ${estadosValidos.join(', ')}` },
+      return jsonWithRequestId(
+        { error: true, message: `Estado inválido. Usa: ${estadosValidos.join(', ')}`, requestId },
         { status: 400 },
+        requestId,
       );
     }
     estadoFiltro = estado;
@@ -159,12 +178,17 @@ export async function GET(request) {
   const total = countResult.rows[0]?.total || 0;
   const data = dataResult.rows.map(mapPedidoRow);
 
-  return NextResponse.json({
-    error: false,
-    data,
-    total,
-    page,
-    limit,
-    pages: Math.ceil(total / limit),
-  });
+  return jsonWithRequestId(
+    {
+      error: false,
+      data,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+      requestId,
+    },
+    undefined,
+    requestId,
+  );
 }
