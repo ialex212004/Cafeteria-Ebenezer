@@ -7,7 +7,7 @@ const path = require('path');
 const config = require('../config');
 
 const logsDir = config.logsDir;
-const shouldWriteToFile = config.isProduction && !process.env.VERCEL;
+const shouldWriteToFile = false;
 
 function ensureLogsDir() {
   if (!shouldWriteToFile) {
