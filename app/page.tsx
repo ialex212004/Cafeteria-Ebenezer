@@ -9,7 +9,7 @@ import GallerySection from "./components/GallerySection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 
-const Index = () => {
+export default function Page() {
   const [selectedProduct, setSelectedProduct] = useState<string>("");
 
   return (
@@ -23,6 +23,4 @@ const Index = () => {
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}

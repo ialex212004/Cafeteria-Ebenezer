@@ -99,6 +99,7 @@ function MenuCard({ item, onOrder }: { item: typeof menuItems[0]; onOrder: (name
             {item.price}€ <span className="text-[14px] font-normal font-body" style={{ color: "rgba(26,20,16,0.4)" }}>/ud.</span>
           </span>
           <button
+            type="button"
             onClick={() => onOrder(item.name)}
             className="w-10 h-10 rounded-xl text-white text-[22px] leading-none flex items-center justify-center
                        transition-all duration-300 hover:scale-110 hover:rotate-90"

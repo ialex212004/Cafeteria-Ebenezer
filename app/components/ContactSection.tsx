@@ -155,10 +155,10 @@ export default function ContactSection({ selectedProduct }: { selectedProduct?: 
                   <input
                     type={f.type}
                     placeholder={f.placeholder}
-                    value={(form as Record<string, string>)[f.key]}
+                    value={(form as any)[f.key]}
                     onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl text-[14px] outline-none transition-all duration-200"
-                    style={inputBase}
+                    style={{ ...inputBase, '::placeholder': { color: "rgba(245,237,216,0.3)" } } as any}
                     onFocus={inputFocus}
                     onBlur={inputBlur}
                   />
