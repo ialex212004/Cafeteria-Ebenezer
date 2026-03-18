@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Cafeteria Ebenezer",
-  description: "Cafe de dia, pizza de noche en Cafeteria Ebenezer.",
+  title: "Cafetería Ébenezer",
+  description: "Café de día, pizza de noche. Granos seleccionados y pizzas artesanales.",
 };
 
 export default function RootLayout({
