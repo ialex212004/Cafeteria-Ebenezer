@@ -46,22 +46,23 @@ export default function Home() {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
+  const navTimeoutRef = useRef<number | null>(null);
+  const messageTimeoutRef = useRef<number | null>(null);
 
   const duplicatedReviews = useMemo(() => [...reviews, ...reviews], [reviews]);
 
   const navTo = useCallback((id: string) => {
     setMenuOpen(false);
-    document.body.style.overflow = "";
-    setTimeout(() => {
+    if (navTimeoutRef.current) {
+      window.clearTimeout(navTimeoutRef.current);
+    }
+    navTimeoutRef.current = window.setTimeout(() => {
       document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     }, 420);
   }, []);
 
   const toggleMenu = useCallback(() => {
-    setMenuOpen((prev) => {
-      document.body.style.overflow = !prev ? "hidden" : "";
-      return !prev;
-    });
+    setMenuOpen((prev) => !prev);
   }, []);
 
   // ESC key
@@ -69,11 +70,21 @@ export default function Home() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && menuOpen) {
         setMenuOpen(false);
-        document.body.style.overflow = "";
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.paddingRight = menuOpen && scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
   }, [menuOpen]);
 
   useEffect(() => {
@@ -91,18 +102,32 @@ export default function Home() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     let W = 0, H = 0, af = 0;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const palette = ["rgba(212,168,83,", "rgba(168,50,40,", "rgba(242,236,224,"];
-    const pts = Array.from({ length: 55 }, () => ({
+    const particleCount = window.innerWidth < 768 ? 28 : 45;
+    const pts = Array.from({ length: particleCount }, () => ({
       x: Math.random() * 1920, y: Math.random() * 1080,
       r: Math.random() * 1.4 + 0.3,
       vx: (Math.random() - 0.5) * 0.18, vy: -Math.random() * 0.22 - 0.05,
       a: Math.random() * 0.45 + 0.1,
       c: palette[Math.floor(Math.random() * palette.length)],
     }));
-    const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
+    const resize = () => {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
       pts.forEach((p) => {
@@ -129,8 +154,22 @@ export default function Home() {
     setReviews((prev) => [{ name: n, text: t, stars: rating, avatarStyle: styles[Math.floor(Math.random() * styles.length)] }, ...prev]);
     setName(""); setText(""); setRating(5); setMessageError(false);
     setMessage(`¡Gracias ${n}! Tu reseña aparece en el carrusel.`);
-    setTimeout(() => setMessage(""), 4000);
+    if (messageTimeoutRef.current) {
+      window.clearTimeout(messageTimeoutRef.current);
+    }
+    messageTimeoutRef.current = window.setTimeout(() => setMessage(""), 4000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (navTimeoutRef.current) {
+        window.clearTimeout(navTimeoutRef.current);
+      }
+      if (messageTimeoutRef.current) {
+        window.clearTimeout(messageTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -186,23 +225,26 @@ export default function Home() {
           position: fixed; inset: 0; z-index: 250;
           display: grid; grid-template-columns: 1fr 1fr;
           pointer-events: none;
+          visibility: hidden;
         }
         .overlay-panel {
           background: var(--bg2);
           transform: translateY(-100%);
           transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+          will-change: transform;
         }
         .overlay-panel:nth-child(2) { background: var(--bg3); transition-delay: 0.05s; }
-        #menuOverlay.open { pointer-events: all; }
+        #menuOverlay.open { pointer-events: all; visibility: visible; }
         #menuOverlay.open .overlay-panel { transform: translateY(0); }
 
         #menuContent {
           position: fixed; inset: 0; z-index: 260;
           display: flex; flex-direction: column; justify-content: center;
           padding: 0 8vw; pointer-events: none;
-          opacity: 0; transition: opacity 0.3s 0.25s;
+          opacity: 0; visibility: hidden;
+          transition: opacity 0.3s 0.25s, visibility 0s linear 0.55s;
         }
-        #menuContent.open { opacity: 1; pointer-events: all; }
+        #menuContent.open { opacity: 1; pointer-events: all; visibility: visible; transition: opacity 0.3s 0.25s, visibility 0s; }
 
         .overlay-nav-list { list-style: none; margin-bottom: 3rem; }
         .overlay-nav-item { overflow: hidden; margin-bottom: 0.25rem; }
@@ -213,6 +255,7 @@ export default function Home() {
           font-weight: 700; color: var(--fg); letter-spacing: -0.02em;
           transform: translateY(110%);
           transition: transform 0.6s var(--ease), color 0.3s;
+          will-change: transform;
         }
         #menuContent.open .overlay-nav-link { transform: translateY(0); }
         .overlay-nav-item:nth-child(1) .overlay-nav-link { transition-delay: 0.28s; }
@@ -240,7 +283,7 @@ export default function Home() {
         #inicio { height: 100vh; min-height: 600px; display: flex; overflow: hidden; }
         .hero-panel { position: relative; flex: 1; display: flex; align-items: flex-end; overflow: hidden; transition: flex 0.6s cubic-bezier(0.25,1,0.5,1); min-width: 0; }
         .hero-panel:hover { flex: 1.25; }
-        .hero-panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-smooth); filter: brightness(0.45) saturate(0.8); }
+        .hero-panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-smooth), filter 0.8s var(--ease-smooth); filter: brightness(0.45) saturate(0.8); will-change: transform; }
         .hero-panel:hover img { transform: scale(1.06); filter: brightness(0.5) saturate(0.9); }
         .hero-grad { position: absolute; inset: 0; }
         .hero-panel-day .hero-grad { background: linear-gradient(to top, rgba(14,11,8,0.97) 0%, rgba(14,11,8,0.5) 40%, rgba(14,11,8,0.1) 100%), linear-gradient(to right, rgba(14,11,8,0.6) 0%, transparent 55%), radial-gradient(ellipse 60% 40% at 30% 80%, rgba(212,168,83,0.08) 0%, transparent 70%); }
@@ -310,7 +353,7 @@ export default function Home() {
         /* ── GALLERY ── */
         .gallery-header { margin-bottom: 3rem; }
         .gallery-track-wrap { overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%); }
-        .gallery-track { display: flex; gap: 1rem; overflow-x: auto; padding: 0 2rem 1rem; scrollbar-width: none; scroll-snap-type: x mandatory; }
+        .gallery-track { display: flex; gap: 1rem; overflow-x: auto; padding: 0 2rem 1rem; scrollbar-width: none; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
         .gallery-track::-webkit-scrollbar { display: none; }
         .gallery-card { flex-shrink: 0; width: 280px; scroll-snap-align: start; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .gallery-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; filter: brightness(0.75) saturate(0.8); transition: transform 0.7s var(--ease-smooth), filter 0.5s; }
@@ -345,8 +388,8 @@ export default function Home() {
         .rform-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .rform-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
         .rform-group label { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg3); font-family: var(--font-display); }
-        .rform-group input, .rform-group textarea { background: var(--bg2); border: 1px solid var(--border2); color: var(--fg); padding: 0.7rem 0.9rem; font-family: var(--font-body); font-size: 0.83rem; outline: none; resize: none; transition: border-color 0.2s; }
-        .rform-group input:focus, .rform-group textarea:focus { border-color: var(--gold); }
+        .rform-group input, .rform-group textarea { background: var(--bg2); border: 1px solid var(--border2); color: var(--fg); padding: 0.7rem 0.9rem; font-family: var(--font-body); font-size: 0.83rem; outline: none; resize: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; }
+        .rform-group input:focus, .rform-group textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,83,0.12); background: rgba(19,16,9,0.96); }
         .rform-group input::placeholder, .rform-group textarea::placeholder { color: var(--fg3); }
         .rstar-picker { display: flex; gap: 0.2rem; padding: 0.5rem 0; }
         .rstar-picker span { font-size: 1.6rem; color: var(--fg3); cursor: pointer; transition: color 0.12s, transform 0.12s; user-select: none; }
@@ -415,7 +458,7 @@ export default function Home() {
       {/* NAV */}
       <nav id="navbar" className={scrolled ? "scrolled" : ""}>
         <div className="nav-inner">
-          <a href="#inicio" className="nav-logo" onClick={() => navTo("inicio")}>
+          <a href="#inicio" className="nav-logo" onClick={(e) => { e.preventDefault(); navTo("inicio"); }}>
             Cafetería <span>Ébenezer</span>
           </a>
           <button className={`menu-toggle${menuOpen ? " open" : ""}`} onClick={toggleMenu} aria-label="Abrir menú">
@@ -587,7 +630,7 @@ export default function Home() {
               { src: "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=80", alt: "Ambiente", label: "Nuestro ambiente" },
             ].map((img) => (
               <div key={img.alt} className="gallery-card">
-                <Image src={img.src} alt={img.alt} width={600} height={800} sizes="280px" />
+                <Image src={img.src} alt={img.alt} width={600} height={800} sizes="(max-width: 768px) 240px, 280px" />
                 <div className="gallery-card-label">{img.label}</div>
               </div>
             ))}
