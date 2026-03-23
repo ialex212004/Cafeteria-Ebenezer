@@ -98,15 +98,15 @@ export default function SplashScreen() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1rem',
+          gap: '1.1rem',
           width: 'min(92vw, 420px)',
-          padding: '2rem 1.75rem',
+          padding: '2.15rem 1.9rem',
           borderRadius: '28px',
-          border: '1px solid rgba(212,168,83,0.12)',
-          background: 'linear-gradient(180deg, rgba(32,26,17,0.74) 0%, rgba(19,16,9,0.58) 100%)',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.24), inset 0 1px 0 rgba(242,236,224,0.05)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
+          border: '1px solid rgba(212,168,83,0.16)',
+          background: 'linear-gradient(180deg, rgba(34,27,18,0.88) 0%, rgba(20,16,10,0.82) 100%)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.34), inset 0 1px 0 rgba(242,236,224,0.06)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
           transform: isExiting ? 'translateY(-6px) scale(0.988)' : 'translateY(0) scale(1)',
           opacity: isExiting ? 0 : 1,
           filter: isExiting ? 'blur(6px)' : 'blur(0px)',
@@ -146,24 +146,27 @@ export default function SplashScreen() {
           <p
             style={{
               margin: 0,
-              color: '#f2ece0',
+              color: '#f6efe3',
               fontFamily: 'Poppins, sans-serif',
-              fontSize: '1.3rem',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
+              fontSize: 'clamp(1.18rem, 2vw, 1.42rem)',
+              fontWeight: 700,
+              letterSpacing: '0.095em',
               textTransform: 'uppercase',
+              lineHeight: 1.05,
+              textShadow: '0 2px 14px rgba(0,0,0,0.18)',
             }}
           >
-            Cafetería <span style={{ color: '#d4a853', fontStyle: 'italic', textTransform: 'none' }}>Ébenezer</span>
+            Cafetería <span style={{ color: '#d9ac57', fontStyle: 'italic', textTransform: 'none', letterSpacing: '0.06em' }}>Ébenezer</span>
           </p>
           <p
             style={{
-              margin: '0.45rem 0 0',
-              color: '#a89880',
+              margin: '0.4rem 0 0',
+              color: '#b7a38a',
               fontFamily: 'Libre Baskerville, serif',
-              fontSize: '0.82rem',
-              letterSpacing: '0.14em',
+              fontSize: '0.84rem',
+              letterSpacing: '0.16em',
               textTransform: 'uppercase',
+              lineHeight: 1.45,
             }}
           >
             Café de día · Pizza de noche
