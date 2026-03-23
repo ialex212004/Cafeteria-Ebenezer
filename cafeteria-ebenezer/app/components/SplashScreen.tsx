@@ -5,41 +5,69 @@ import { useEffect, useState } from 'react'
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(true)
-  const [fadeOut, setFadeOut] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
-    let fadeTimer: number | undefined
+    let exitTimer: number | undefined
     let hideTimer: number | undefined
+    let frameId: number | undefined
+    let hasStartedExit = false
     const previousOverflow = document.body.style.overflow
+    const previousPaddingRight = document.body.style.paddingRight
+    const splashStartedAt = performance.now()
+    const minimumVisibleMs = 950
+    const exitDurationMs = 720
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
 
     document.body.style.overflow = 'hidden'
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+    }
 
-    const handleLoad = () => {
-      fadeTimer = window.setTimeout(() => {
-        setFadeOut(true)
+    const restoreBody = () => {
+      document.body.style.overflow = previousOverflow
+      document.body.style.paddingRight = previousPaddingRight
+    }
+
+    const startExit = () => {
+      if (hasStartedExit) return
+      hasStartedExit = true
+
+      const elapsed = performance.now() - splashStartedAt
+      const remaining = Math.max(minimumVisibleMs - elapsed, 0)
+
+      exitTimer = window.setTimeout(() => {
+        frameId = window.requestAnimationFrame(() => {
+          setIsExiting(true)
+        })
+
         hideTimer = window.setTimeout(() => {
           setVisible(false)
-          document.body.style.overflow = previousOverflow
-        }, 650)
-      }, 450)
+          restoreBody()
+        }, exitDurationMs)
+      }, remaining)
     }
 
     if (document.readyState === 'complete') {
-      handleLoad()
+      startExit()
     } else {
-      window.addEventListener('load', handleLoad)
+      window.addEventListener('load', startExit, { once: true })
     }
 
     return () => {
-      window.removeEventListener('load', handleLoad)
-      document.body.style.overflow = previousOverflow
+      window.removeEventListener('load', startExit)
+      restoreBody()
 
-      if (fadeTimer !== undefined) {
-        window.clearTimeout(fadeTimer)
+      if (exitTimer !== undefined) {
+        window.clearTimeout(exitTimer)
       }
 
       if (hideTimer !== undefined) {
         window.clearTimeout(hideTimer)
+      }
+
+      if (frameId !== undefined) {
+        window.cancelAnimationFrame(frameId)
       }
     }
   }, [])
@@ -58,11 +86,11 @@ export default function SplashScreen() {
         justifyContent: 'center',
         background:
           'radial-gradient(circle at top, rgba(212,168,83,0.08), transparent 32%), linear-gradient(180deg, rgba(19,16,9,0.76) 0%, rgba(14,11,8,0.88) 100%)',
-        backdropFilter: fadeOut ? 'blur(0px)' : 'blur(18px)',
-        WebkitBackdropFilter: fadeOut ? 'blur(0px)' : 'blur(18px)',
-        opacity: fadeOut ? 0 : 1,
-        pointerEvents: fadeOut ? 'none' : 'all',
-        transition: 'opacity 0.7s ease, backdrop-filter 0.7s ease, -webkit-backdrop-filter 0.7s ease',
+        backdropFilter: isExiting ? 'blur(8px)' : 'blur(18px)',
+        WebkitBackdropFilter: isExiting ? 'blur(8px)' : 'blur(18px)',
+        opacity: isExiting ? 0 : 1,
+        pointerEvents: isExiting ? 'none' : 'all',
+        transition: 'opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.72s cubic-bezier(0.22, 1, 0.36, 1), -webkit-backdrop-filter 0.72s cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
       <div
@@ -79,10 +107,10 @@ export default function SplashScreen() {
           boxShadow: '0 24px 60px rgba(0,0,0,0.24), inset 0 1px 0 rgba(242,236,224,0.05)',
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
-          transform: fadeOut ? 'translateY(-8px) scale(0.985)' : 'translateY(0) scale(1)',
-          opacity: fadeOut ? 0 : 1,
-          filter: fadeOut ? 'blur(10px)' : 'blur(0px)',
-          transition: 'transform 0.7s ease, opacity 0.55s ease, filter 0.7s ease',
+          transform: isExiting ? 'translateY(-6px) scale(0.988)' : 'translateY(0) scale(1)',
+          opacity: isExiting ? 0 : 1,
+          filter: isExiting ? 'blur(6px)' : 'blur(0px)',
+          transition: 'transform 0.72s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.56s ease, filter 0.72s cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >
         <div
@@ -104,6 +132,7 @@ export default function SplashScreen() {
             width={56}
             height={56}
             unoptimized
+            priority
             style={{
               width: '56px',
               height: '56px',
