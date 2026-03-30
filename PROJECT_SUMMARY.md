@@ -46,7 +46,7 @@ Cafetería Ebenezer (Root)
 │       └── index.html       → App estática responsiva
 │
 ├── Config
-│   ├── .env.example         → Variables entorno
+│   ├── private/.env.example → Variables entorno
 │   ├── .eslintrc.json       → Linting JS
 │   ├── .prettierrc.json     → Formatting
 │   ├── package.json         → Dependencias

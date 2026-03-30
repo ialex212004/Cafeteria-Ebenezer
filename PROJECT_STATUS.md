@@ -203,7 +203,7 @@ Cafeteria-Ebenezer/
 ├── 📄 vercel.json               Vercel config ✅
 ├── 📄 package.json              Dependencies
 ├── 📄 .gitignore                Git rules
-├── 📄 .env.example              Env template
+├── 📄 private/.env.example      Env template
 │
 └── 📋 DOCUMENTATION (15 files)
     ├── README.md

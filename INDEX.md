@@ -236,7 +236,7 @@ wc -l *.md | tail -1
 | ¿Necesito correr algo? | npm start (para testing) luego en otra terminal tests |
 | ¿Después de revisión? | git push, luego HOSTINGER_SETUP.md |
 | ¿Qué si algo falla? | Buscar error en PRE_DEPLOY_REVIEW.md sección correspondiente |
-| ¿Credenciales en código? | NO - .env nunca en git, solo .env.example |
+| ¿Credenciales en código? | NO - .env nunca en git, solo private/.env.example |
 | ¿Está seguro deploy? | Sí - si toda revisión ✅ pasa |
 
 ---

@@ -44,7 +44,7 @@
 │  ├─ README.md completo                                     │
 │  ├─ API.md con ejemplos CURL                              │
 │  ├─ CONTRIBUTING.md para devs                              │
-│  ├─ .env.example configurado                               │
+│  ├─ private/.env.example configurado                       │
 │  ├─ Comentarios en código (JSDoc)                          │
 │  └─ BACKEND_AUDIT.md detallado                             │
 │                                                              │

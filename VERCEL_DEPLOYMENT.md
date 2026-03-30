@@ -16,7 +16,7 @@ Cafeteria-Ebenezer/
 │   └── validators/
 ├── data/                     # JSON files (temporal)
 ├── vercel.json              # ⭐ Configuración de Vercel
-├── .env.vercel.example      # ⭐ Variables para Vercel
+├── private/.env.vercel.example      # ⭐ Variables para Vercel
 ├── .gitignore               # ⭐ Actualizado con .vercel
 ├── package.json             # ⭐ Scripts actualizados
 ├── server.js                # Todavía existe para dev local
@@ -30,7 +30,7 @@ Cafeteria-Ebenezer/
 ✅ Archivos creados:
 - `api/index.js` - Función serverless de Express
 - `vercel.json` - Rutas y configuración
-- `.env.vercel.example` - Variables de entorno para Vercel
+- `private/.env.vercel.example` - Variables de entorno para Vercel
 - `.gitignore` - Actualizado con archivos de Vercel
 
 ---
@@ -45,7 +45,7 @@ git status
 
 ### 2.2 - Agregar cambios
 ```bash
-git add api/index.js vercel.json .env.vercel.example .gitignore package.json
+git add api/index.js vercel.json private/.env.vercel.example .gitignore package.json
 ```
 
 ### 2.3 - Crear commit
@@ -56,7 +56,7 @@ git commit -m "🚀 Vercel deployment: serverless backend + static frontend
 - Added vercel.json: Routes and build configuration
 - Updated .gitignore: Added Vercel exclusions
 - Updated package.json: Added vercel scripts
-- Added .env.vercel.example: Environment template"
+- Added private/.env.vercel.example: Environment template"
 ```
 
 ### 2.4 - Push a GitHub (MÁXIMO IMPORTANTE)

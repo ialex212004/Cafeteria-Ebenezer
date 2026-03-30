@@ -68,9 +68,9 @@
 
 ### 1.3 Configuración Backend
 
-- [ ] **`.env.example` contiene todas las variables:**
+- [ ] **`private/.env.example` contiene todas las variables:**
   ```bash
-  cat .env.example
+  cat private/.env.example
   ```
   Debe incluir:
   - NODE_ENV
@@ -471,7 +471,7 @@ Debe mostrar:
 - [ ] **`.env` NO está en git:**
   ```bash
   git ls-files | grep ".env$"
-  # No debe mostrar nada (solo .env.example)
+  # No debe mostrar nada (solo private/.env.example)
   ```
 
 ---
@@ -499,13 +499,13 @@ Debe mostrar:
 
 ### 6.2 Environment Variables
 
-- [ ] **`.env.example` está completo:**
+- [ ] **`private/.env.example` está completo:**
   ```bash
-  cat .env.example
+  cat private/.env.example
   # Revisar que tenga todas las variables necesarias
   ```
 
-- [ ] **Todos los valores en `.env.example` son ejemplos (no secretos reales)**
+- [ ] **Todos los valores en `private/.env.example` son ejemplos (no secretos reales)**
 
 ### 6.3 Logs
 

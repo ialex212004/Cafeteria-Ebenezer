@@ -14,7 +14,7 @@
 - [x] Punto de entrada único (server.js)
 - [x] Scripts npm configurados (start, dev, lint, format)
 - [x] ESLint + Prettier integrados
-- [x] .env.example con variables de entorno
+- [x] private/.env.example con variables de entorno
 
 ### 2. **Configuración Centralizada**
 - [x] `src/config/index.js` - Todo en un lugar

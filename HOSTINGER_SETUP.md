@@ -28,7 +28,7 @@ www.cafeteria-ebenezer.com (online)
 ```
 ✅ Code en GitHub (próximo step)
 ✅ package.json con "start" script
-✅ .env.example configurado
+✅ private/.env.example configurado
 ✅ PORT 3000 en config
 ✅ Express sirviendo archivos estáticos
 ✅ API rest completamente funcional
@@ -87,7 +87,7 @@ Puerto:            3000 (automático)
 ### **PASO 3: Variables de entorno**
 ```
 En el panel:
-- Variables → Agregar todas las del .env.example
+- Variables → Agregar todas las del private/.env.example
 - Pero VALORES REALES (no ejemplo)
 - JWT_SECRET: generar con openssl rand -base64 32
 ```

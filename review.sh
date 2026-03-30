@@ -73,7 +73,7 @@ echo ""
 # ============================================
 echo "⚙️  VERIFICANDO CONFIGURACIÓN..."
 
-test_check ".env.example existe" "[ -f .env.example ]"
+test_check ".env.example existe" "[ -f private/.env.example ]"
 test_check ".gitignore existe" "[ -f .gitignore ]"
 test_check ".eslintrc.json existe" "[ -f .eslintrc.json ]"
 test_check ".prettierrc.json existe" "[ -f .prettierrc.json ]"

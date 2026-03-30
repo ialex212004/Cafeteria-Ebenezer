@@ -2,6 +2,8 @@ node_modules/
 .env
 .env.local
 .env.*.local
+private/.env.example
+private/.env.vercel.example
 .DS_Store
 *.log
 npm-debug.log*

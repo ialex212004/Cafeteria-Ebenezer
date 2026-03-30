@@ -2,7 +2,10 @@
 //  CONFIGURACIÓN CENTRALIZADA
 // ============================================================
 
-require('dotenv').config();
+// Carga variables de entorno desde /private si existe, si no desde raíz
+const fs = require('fs');
+const dotenvPath = fs.existsSync('./private/.env') ? './private/.env' : '.env';
+require('dotenv').config({ path: dotenvPath });
 
 const config = {
   // Entorno

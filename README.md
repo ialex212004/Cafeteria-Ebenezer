@@ -17,7 +17,7 @@ cafeteria-ebenezer/
 ├── logs/                         # Archivos de log - NO hacer commit
 ├── server.js                     # Punto de entrada del servidor
 ├── package.json                  # Dependencias y scripts
-├── .env.example                  # Plantilla de variables de entorno
+├── private/.env.example          # Plantilla de variables de entorno (privado)
 ├── .gitignore                    # Archivos ignorados en Git
 ├── .editorconfig                 # Configuración de editor
 └── LICENSE                       # Licencia MIT
@@ -44,7 +44,7 @@ cafeteria-ebenezer/
 
 3. **Configurar variables de entorno**
    ```bash
-   cp .env.example .env
+   cp private/.env.example .env
    # Edita .env con tus valores
    ```
 
@@ -124,6 +124,8 @@ DELETE /api/resenas/:id       # Eliminar reseña
 ## ⚙️ Configuración
 
 ### Variables de Entorno (.env)
+
+Las plantillas de variables de entorno ahora se encuentran en la carpeta `/private`.
 
 ```env
 # Servidor

@@ -9,7 +9,7 @@ cd /workspaces/Cafeteria-Ebenezer
 git status
 
 # PASO 2: Agregar archivos Vercel
-git add api/index.js vercel.json .env.vercel.example .gitignore package.json
+git add api/index.js vercel.json private/.env.vercel.example .gitignore package.json
 
 # PASO 3: Crear commit descriptivo
 git commit -m "🚀 Vercel deployment: serverless backend + static frontend
@@ -18,7 +18,7 @@ git commit -m "🚀 Vercel deployment: serverless backend + static frontend
 - Added vercel.json: Routes and build configuration
 - Updated .gitignore: Added Vercel exclusions
 - Updated package.json: Added vercel scripts
-- Added .env.vercel.example: Environment template"
+- Added private/.env.vercel.example: Environment template"
 
 # PASO 4: Verificar que estás en main
 git branch
