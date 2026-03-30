@@ -14,11 +14,11 @@ type Review = {
 };
 
 const initialReviews: Review[] = [
-  { name: "María González", text: "El café de especialidad es simplemente increíble. El latte art que hacen es digno de fotografiar. ¡Vuelvo cada semana sin falta!", stars: 5, avatarStyle: "background:rgba(212,168,83,0.15);color:var(--gold2)" },
-  { name: "Carlos Ruiz", text: "La Ébenezer Suprema es una pizza que no se olvida. Masa perfecta, ingredientes frescos y ese ambiente nocturno tan especial.", stars: 5, avatarStyle: "background:rgba(168,50,40,0.15);color:var(--red2)" },
+  { name: "María González", text: "El café de especialidad es simplemente increíble, es digno de fotografiar. ¡Voy cada sabado sin falta!", stars: 5, avatarStyle: "background:rgba(212,168,83,0.15);color:var(--gold2)" },
+  { name: "Carlos Ruiz", text: "El desayuno Eden es algo de lo que no me olvidare. 10/10, ingredientes frescos y ese ambiente tan especial.", stars: 5, avatarStyle: "background:rgba(168,50,40,0.15);color:var(--red2)" },
   { name: "Ana Martínez", text: "Me encanta que puedo desayunar rico por la mañana y cenar pizza de noche en el mismo lugar. El croissant es el mejor que he probado.", stars: 4, avatarStyle: "background:rgba(212,168,83,0.1);color:var(--gold)" },
-  { name: "Luis Herrera", text: "El Cold Brew de 12 horas tiene un sabor incomparable. Vine una vez por recomendación y ya no puedo dejar de venir cada semana.", stars: 5, avatarStyle: "background:rgba(212,168,83,0.15);color:var(--gold2)" },
-  { name: "Sofía Peña", text: "La pizza Mediterránea con jamón serrano y rúcula es una obra maestra. El ambiente, la música, el servicio… todo perfecto.", stars: 5, avatarStyle: "background:rgba(168,50,40,0.15);color:var(--red2)" },
+  { name: "Luis Herrera", text: "Vine una vez por recomendación y ya no puedo dejar de venir cada semana.", stars: 5, avatarStyle: "background:rgba(212,168,83,0.15);color:var(--gold2)" },
+  { name: "Sofía Peña", text: "Las pizzas que venden son una obra maestra. El ambiente, la música, el servicio… todo perfecto.", stars: 5, avatarStyle: "background:rgba(168,50,40,0.15);color:var(--red2)" },
   { name: "Roberto Díaz", text: "Pido cada mañana camino al trabajo. Un lugar que se convierte en parte de tu rutina, Me encanta.", stars: 5, avatarStyle: "background:rgba(212,168,83,0.12);color:var(--gold)" },
 ];
 
@@ -538,7 +538,7 @@ export default function Home() {
           <div className="about-grid">
             <div className="about-img-wrap reveal">
               <div className="about-img-frame">
-                <Image src="" alt="Interior Cafetería Ébenezer" fill sizes="(max-width: 768px) 100vw, 40vw" />
+                <Image src="IMAGEN AQUI" alt="Interior Cafetería Ébenezer" fill sizes="(max-width: 768px) 100vw, 40vw" />
               </div>
               <div className="about-img-accent" />
             </div>
@@ -665,7 +665,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="reviews-pause-hint">Pasa el cursor para pausar</div>
+          <div className="reviews-pause-hint">Pausa</div>
         </div>
         <div className="container">
           <div className="review-form-wrap reveal">
