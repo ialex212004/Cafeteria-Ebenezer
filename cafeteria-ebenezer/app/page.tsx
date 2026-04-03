@@ -504,7 +504,7 @@ export default function Home() {
       {/* HERO */}
       <section id="inicio">
         <div className="hero-panel hero-panel-day" onClick={() => navTo("menu")}>
-          <Image src="https://www.freepik.es/imagen-ia-gratis/vista-maquina-cafe-hacer-cafe-casa_266557226.htm#fromView=search&page=3&position=41&uuid=b5c91526-dd5f-4ec2-836d-6b9ad29b2074&query=coffe" alt="Café artesanal" fill priority sizes="(max-width: 768px) 100vw, 50vw" />
+          <Image src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Café artesanal" fill priority sizes="(max-width: 768px) 100vw, 50vw" />
           <div className="hero-grad" />
           <div className="hero-divider" />
           <div className="hero-content">
@@ -518,7 +518,7 @@ export default function Home() {
           </div>
         </div>
         <div className="hero-panel hero-panel-night hero-night" onClick={() => navTo("menu")}>
-          <Image src="https://www.pexels.com/es-es/foto/pizza-restaurante-mujer-queso-17708242/" alt="Pizza artesanal INICIO" fill priority sizes="(max-width: 768px) 100vw, 50vw" />
+          <Image src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Pizza artesanal INICIO" fill priority sizes="(max-width: 768px) 100vw, 50vw" />
           <div className="hero-grad" />
           <div className="hero-content">
             <span className="hero-tag">Noches en Ébenezer</span>
@@ -538,7 +538,7 @@ export default function Home() {
           <div className="about-grid">
             <div className="about-img-wrap reveal">
               <div className="about-img-frame">
-                <Image src="IMAGEN AQUI" alt="Interior Cafetería Ébenezer" fill sizes="(max-width: 768px) 100vw, 40vw" />
+                <Image src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Interior Cafetería Ébenezer" fill sizes="(max-width: 768px) 100vw, 40vw" />
               </div>
               <div className="about-img-accent" />
             </div>
@@ -624,12 +624,12 @@ export default function Home() {
         <div className="gallery-track-wrap">
           <div className="gallery-track" ref={galleryTrackRef}>
             {[
-              { src: "", alt: "Latte art", label: "Café de especialidad" },
-              { src: "", alt: "Croissant", label: "Repostería artesanal" },
-              { src: "", alt: "Espresso", label: "Espresso perfecto" },
-              { src: "", alt: "Pizza", label: "Pizza margherita" },
-              { src: "", alt: "Pizza artesanal", label: "Horno de piedra" },
-              { src: "", alt: "Ambiente", label: "Nuestro ambiente" },
+              { src: "https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alt: "Latte art", label: "Café de especialidad" },
+              { src: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alt: "Croissant", label: "Repostería artesanal" },
+              { src: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alt: "Espresso", label: "Espresso perfecto" },
+              { src: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alt: "Pizza", label: "Pizza margherita" },
+              { src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alt: "Pizza artesanal", label: "Horno de piedra" },
+              { src: "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alt: "Ambiente", label: "Nuestro ambiente" },
             ].map((img) => (
               <div key={img.alt} className="gallery-card">
                 <Image src={img.src} alt={img.alt} width={600} height={800} sizes="(max-width: 768px) 240px, 280px" />
