@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://cafeteria-ebenezer.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: "Cafetería Ébenezer",
   description: "Café de día, pizza de noche. Granos seleccionados y pizzas artesanales.",
   icons: {
@@ -12,6 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Cafetería Ébenezer",
     description: "Café de día, pizza de noche. Granos seleccionados y pizzas artesanales.",
+    url: baseUrl,
     images: [
       {
         url: "/file.svg",

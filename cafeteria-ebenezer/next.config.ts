@@ -1,6 +1,11 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Configuración de Turbopack para workspace raíz
+  turbopack: {
+    root: path.resolve("./"),
+  },
   images: {
     remotePatterns: [
       {
