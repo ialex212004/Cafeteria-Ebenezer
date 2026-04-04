@@ -1,3 +1,5 @@
+'use client';
+
 import Navigation from '../components/shared/Navigation';
 import Footer from '../components/shared/Footer';
 

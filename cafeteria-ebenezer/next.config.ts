@@ -1,10 +1,6 @@
-import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: path.resolve("./"),
-  },
   images: {
     remotePatterns: [
       {
@@ -20,6 +16,10 @@ const nextConfig: NextConfig = {
         hostname: "www.pexels.com",
       },
     ],
+  },
+  // Optimizaciones para Vercel
+  experimental: {
+    optimizePackageImports: ["react", "react-dom"],
   },
 };
 
