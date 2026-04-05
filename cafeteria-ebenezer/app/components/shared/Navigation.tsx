@@ -100,8 +100,8 @@ export default function Navigation() {
         .menu-toggle {
           position: relative;
           z-index: 301;
-          width: 44px;
-          height: 44px;
+          width: 48px;
+          height: 48px;
           background: transparent;
           border: 1px solid rgba(210, 185, 140, 0.16);
           display: flex;
@@ -109,10 +109,16 @@ export default function Navigation() {
           align-items: center;
           justify-content: center;
           gap: 5px;
-          transition: border-color 0.3s;
+          transition: border-color 0.3s, outline 0.3s;
+          border-radius: 4px;
+          outline: 2px solid transparent;
+          outline-offset: 2px;
         }
         .menu-toggle:hover {
           border-color: #d4a853;
+        }
+        .menu-toggle:focus-visible {
+          outline-color: #d4a853;
         }
         .menu-toggle .bar {
           width: 20px;
@@ -187,7 +193,7 @@ export default function Navigation() {
           margin-bottom: 3rem;
         }
         .overlay-nav-item {
-          overflow: hidden;
+          overflow: visible;
           margin-bottom: 0.25rem;
         }
         .overlay-nav-link {
@@ -201,6 +207,13 @@ export default function Navigation() {
           transform: translateY(110%);
           transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s;
           will-change: transform;
+          padding: 0.75rem 0.5rem;
+          border-radius: 4px;
+          outline: 2px solid transparent;
+          outline-offset: 2px;
+        }
+        .overlay-nav-link:focus-visible {
+          outline-color: #d4a853;
         }
         #menuContent.open .overlay-nav-link {
           transform: translateY(0);
@@ -245,7 +258,8 @@ export default function Navigation() {
           font-family: 'Poppins', sans-serif;
           font-style: italic;
           font-size: 1rem;
-          color: #5c5040;
+          color: #9d9184;
+          line-height: 1.6;
         }
         .overlay-tagline em {
           color: #d4a853;
@@ -258,12 +272,19 @@ export default function Navigation() {
           font-size: 0.72rem;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-          color: #5c5040;
+          color: #c9b896;
           transition: color 0.2s;
           text-decoration: none;
+          padding: 0.5rem 0.25rem;
+          border-radius: 3px;
+          outline: 2px solid transparent;
+          outline-offset: 2px;
         }
         .overlay-social a:hover {
           color: #d4a853;
+        }
+        .overlay-social a:focus-visible {
+          outline-color: #d4a853;
         }
 
         @media (max-width: 768px) {

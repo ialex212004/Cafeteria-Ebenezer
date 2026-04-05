@@ -418,9 +418,9 @@ export default function ReseniasPage() {
               <div className="eyebrow" style={{ marginBottom: '0.5rem' }}>
                 Comparte tu experiencia
               </div>
-              <h3 className="review-form-title">
+              <h2 className="review-form-title">
                 Deja tu <em>reseña</em>
-              </h3>
+              </h2>
             </div>
             <div>
               <div className="rform-row">

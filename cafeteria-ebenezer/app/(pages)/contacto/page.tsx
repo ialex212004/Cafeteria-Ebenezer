@@ -223,7 +223,7 @@ export default function ContactoPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4>Dirección</h4>
+                  <h2>Dirección</h2>
                   <p>Calle la Paz, 28-A · Valdepeñas, 13300 · Ciudad Real, España</p>
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function ContactoPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4>Horarios</h4>
+                  <h2>Horarios</h2>
                   <p>
                     Lunes a Domingo: 08:00 – 23:00
                     <br />
@@ -250,7 +250,7 @@ export default function ContactoPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4>Teléfono</h4>
+                  <h2>Teléfono</h2>
                   <a href="tel:+34623272728">+34 623 272 728</a>
                 </div>
               </div>
