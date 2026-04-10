@@ -4,6 +4,86 @@ import { useEffect, useState } from 'react';
 
 type MenuTab = 'Cafe' | 'Pizza';
 
+type MenuItem = {
+  name: string;
+  desc: string;
+  price: string;
+  note?: string;
+};
+
+type MenuCategory = {
+  title: string;
+  roman: string;
+  items: MenuItem[];
+};
+
+const cafeMenu: MenuCategory[] = [
+  {
+    title: 'Bebidas calientes',
+    roman: 'I',
+    items: [
+      { name: 'Espresso Ristretto', desc: 'Grano de finca única, extracción corta e intensa', price: '3,50', note: 'House selection' },
+      { name: 'Cappuccino Tradizionale', desc: 'Espresso, leche texturizada y cacao de Modica', price: '4,50' },
+      { name: 'Flat White', desc: 'Doble espresso, microfoam sedosa', price: '4,80' },
+      { name: 'Mocha Noir', desc: 'Espresso, chocolate negro 70% y crema fresca', price: '5,20' },
+      { name: 'Té Imperial Chai', desc: 'Té negro Assam, cardamomo, canela y leche tibia', price: '4,00' },
+    ],
+  },
+  {
+    title: 'Colección fría',
+    roman: 'II',
+    items: [
+      { name: 'Cold Brew Reserva', desc: 'Infusión lenta en frío, doce horas de espera', price: '5,00' },
+      { name: 'Frappé de la Casa', desc: 'Café helado, vainilla de Madagascar y crema batida', price: '5,50' },
+      { name: 'Limonada de Albahaca', desc: 'Limón fresco, albahaca del huerto, agua con gas', price: '3,80' },
+      { name: 'Matcha Latte Ceremonial', desc: 'Matcha grado ceremonial, leche de avena', price: '5,40' },
+    ],
+  },
+  {
+    title: 'Dulces & Repostería',
+    roman: 'III',
+    items: [
+      { name: 'Croissant de Mantequilla', desc: 'Mantequilla francesa AOP, hojaldrado en casa', price: '3,20' },
+      { name: 'Tarta de Queso Vasca', desc: 'Queso curado, caramelización suave, base quemada', price: '6,20', note: 'Especialidad' },
+      { name: 'Brownie Valrhona', desc: 'Chocolate belga, nuez pecana, flor de sal', price: '4,40' },
+      { name: 'Cannelé Bordelés', desc: 'Interior cremoso, corteza de caramelo rubio', price: '3,60' },
+    ],
+  },
+];
+
+const pizzaMenu: MenuCategory[] = [
+  {
+    title: 'Pizzas Signature',
+    roman: 'I',
+    items: [
+      { name: 'Margherita D.O.P.', desc: 'Tomate San Marzano, mozzarella di bufala, albahaca genovesa', price: '12,00', note: 'La original' },
+      { name: 'Pepperoni Piccante', desc: 'Pepperoni italiano, miel de romero, mozzarella fior di latte', price: '14,00' },
+      { name: 'Tartufo Nero', desc: 'Crema de trufa negra, mozzarella, huevo de corral y parmesano 24m', price: '18,00', note: 'Selección' },
+      { name: 'Quattro Formaggi', desc: 'Mozzarella, gorgonzola DOP, parmigiano reggiano y fontina', price: '15,00' },
+    ],
+  },
+  {
+    title: 'Creaciones de autor',
+    roman: 'II',
+    items: [
+      { name: 'Ébenezer Suprema', desc: 'Solomillo, chorizo ibérico, pimientos asados y aceitunas Kalamata', price: '17,00' },
+      { name: 'Mediterránea', desc: 'Cherry confitado, rúcula salvaje, jamón ibérico 36m y parmesano', price: '16,00' },
+      { name: 'Bosco Selvatico', desc: 'Crema de setas, boletus, prosciutto di Parma y aceite de trufa', price: '17,50' },
+      { name: 'Burrata di Andria', desc: 'Base blanca, burrata entera, tomate pasificado y albahaca', price: '16,50' },
+    ],
+  },
+  {
+    title: 'Para compartir',
+    roman: 'III',
+    items: [
+      { name: 'Tabla de Antipasti', desc: 'Selección de embutidos ibéricos, quesos curados y encurtidos', price: '18,00' },
+      { name: 'Focaccia al Rosmarino', desc: 'Aceite de oliva virgen extra, romero fresco y flor de sal', price: '6,00' },
+      { name: 'Ensalada de Temporada', desc: 'Brotes tiernos, burrata, vinagreta de trufa', price: '9,50' },
+      { name: 'Alitas al Horno', desc: 'Marinado de la casa, ahumado ligero, alioli negro', price: '8,00' },
+    ],
+  },
+];
+
 export default function MenuPage() {
   const [activeTab, setActiveTab] = useState<MenuTab>('Cafe');
 
@@ -16,375 +96,359 @@ export default function MenuPage() {
             observer.unobserve(e.target);
           }
         }),
-      { threshold: 0.12 }
+      { threshold: 0.08 }
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [activeTab]);
+
+  const categories = activeTab === 'Cafe' ? cafeMenu : pizzaMenu;
 
   return (
     <>
       <style jsx global>{`
-        :root {
-          --bg: #0e0b08;
-          --bg3: #18140d;
-          --border: rgba(210, 185, 140, 0.08);
-          --border2: rgba(210, 185, 140, 0.16);
-          --fg: #f2ece0;
-          --fg2: #a89880;
-          --fg3: #5c5040;
-          --gold: #d4a853;
-          --font-display: 'Poppins', sans-serif;
-          --font-body: 'Libre Baskerville', Georgia, serif;
-          --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        .menu-hero {
+          position: relative;
+          margin-top: var(--stack);
+          padding: clamp(6rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 6vw, 5rem);
+          text-align: center;
+          background:
+            radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201, 169, 110, 0.06) 0%, transparent 70%),
+            var(--obsidian);
+          border-bottom: 1px solid var(--border-hair);
         }
-
-        body {
-          background: var(--bg);
-          color: var(--fg);
-        }
-
-        .section {
-          padding: 7rem 5rem;
-          margin-top: 70px;
-        }
-        .section-surface {
-          background: var(--bg3);
-          background-image: radial-gradient(ellipse 70% 50% at 85% 15%, rgba(212, 168, 83, 0.05) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 60% at 5% 90%, rgba(168, 50, 40, 0.04) 0%, transparent 70%);
-        }
-        .container {
-          max-width: 1180px;
+        .menu-hero-inner {
+          max-width: 860px;
           margin: 0 auto;
         }
-        .eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--gold);
-          font-weight: 500;
-          margin-bottom: 1.25rem;
-          justify-content: center;
-        }
-        .eyebrow::before {
-          content: '';
-          width: 28px;
-          height: 1px;
-          background: var(--gold);
-        }
-        .section-title {
+        .menu-hero h1 {
           font-family: var(--font-display);
-          font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-          font-weight: 600;
-          line-height: 1.15;
-          color: var(--fg);
+          font-weight: 300;
+          font-size: clamp(3rem, 6vw, 5.6rem);
+          line-height: 1;
+          color: var(--pearl);
+          margin: 1.5rem 0;
+          letter-spacing: -0.015em;
         }
-        .section-title em {
+        .menu-hero h1 em {
           font-style: italic;
-          color: var(--gold);
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .menu-hero p {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.95rem;
+          color: var(--taupe);
+          line-height: 1.85;
+          max-width: 54ch;
+          margin: 0 auto;
+        }
+        .menu-hero .ornament {
+          font-family: var(--font-italiana);
+          font-size: 1.4rem;
+          color: var(--champagne);
+          letter-spacing: 0.4em;
+          opacity: 0.7;
+          margin: 2.5rem 0 1.5rem;
+        }
+        .menu-hero .ornament span {
+          display: inline-block;
+          margin: 0 0.6em;
         }
 
-        .menu-header {
-          text-align: center;
-          margin-bottom: 3.5rem;
-        }
+        /* ── Tabs ── */
         .menu-tabs-wrap {
           display: flex;
           justify-content: center;
-          margin-bottom: 3.5rem;
+          padding: clamp(3rem, 5vw, 5rem) 1.5rem 1rem;
+          background: var(--obsidian);
         }
         .menu-tabs {
           display: inline-flex;
-          border: 1px solid var(--border2);
-          padding: 4px;
+          gap: 0;
+          position: relative;
+          padding: 0;
         }
         .menu-tab {
-          font-family: var(--font-body);
-          font-size: 0.75rem;
-          letter-spacing: 0.1em;
+          font-family: var(--font-sans);
+          font-size: 0.66rem;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          font-weight: 500;
-          padding: 0.65rem 2.2rem;
-          border: none;
+          font-weight: 400;
+          padding: 1.1rem 2.6rem;
+          color: var(--stone);
+          border: 1px solid var(--border-hair);
           background: transparent;
-          color: var(--fg3);
-          transition: all 0.3s;
+          transition: color 0.55s var(--ease-silk), border-color 0.55s var(--ease-silk),
+            background 0.55s var(--ease-silk);
+          position: relative;
+        }
+        .menu-tab + .menu-tab {
+          border-left: none;
         }
         .menu-tab.active {
-          background: var(--gold);
-          color: var(--bg);
+          color: var(--ink);
+          background: var(--champagne);
+          border-color: var(--champagne);
         }
         .menu-tab:not(.active):hover {
-          color: var(--fg);
+          color: var(--pearl);
+          border-color: var(--border-soft);
         }
-        .menu-content {
-          max-width: 720px;
-          margin: 0 auto;
-        }
-        .menu-section-title {
-          font-family: var(--font-display);
-          font-size: 1.2rem;
-          font-weight: 600;
-          color: var(--fg2);
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          margin-bottom: 1.25rem;
-          padding-bottom: 0.75rem;
-          border-bottom: 1px solid var(--border);
-        }
-        .menu-cat {
-          margin-bottom: 2.75rem;
-        }
-        .menu-item {
-          display: flex;
-          align-items: baseline;
-          justify-content: space-between;
-          gap: 1rem;
-          padding: 0.9rem 1.1rem;
-          border: 1px solid transparent;
-          transition: border-color 0.25s, background 0.25s;
-        }
-        .menu-item:hover {
-          border-color: var(--border);
-          background: var(--surface);
-        }
-        .item-name {
-          font-family: var(--font-display);
-          font-weight: 500;
+        .menu-tab small {
+          display: block;
+          font-family: var(--font-italiana);
           font-size: 0.9rem;
-          color: var(--fg);
-          margin-bottom: 0.2rem;
-        }
-        .item-desc {
-          font-size: 0.78rem;
-          color: var(--fg3);
-        }
-        .item-price {
-          font-family: var(--font-display);
-          font-size: 0.95rem;
-          font-weight: 600;
-          color: var(--gold);
-          white-space: nowrap;
-          flex-shrink: 0;
+          margin-top: 0.4rem;
+          letter-spacing: 0.05em;
+          text-transform: none;
+          color: inherit;
         }
 
-        .reveal {
-          opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 1.5s var(--ease-smooth), transform 1.5s var(--ease-smooth);
+        /* ── Menu body ── */
+        .menu-body {
+          padding: clamp(3rem, 6vw, 6rem) clamp(1.5rem, 5vw, 5rem) clamp(6rem, 10vw, 10rem);
+          background: linear-gradient(180deg, var(--obsidian) 0%, var(--onyx) 60%, var(--obsidian) 100%);
         }
-        .reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
+        .menu-body-inner {
+          max-width: 860px;
+          margin: 0 auto;
         }
-        .reveal-delay-1 {
-          transition-delay: 0.1s;
+        .menu-category {
+          margin-bottom: 5rem;
         }
-        .reveal-delay-2 {
-          transition-delay: 0.2s;
+        .menu-category-head {
+          display: flex;
+          align-items: baseline;
+          gap: 2rem;
+          padding-bottom: 2rem;
+          margin-bottom: 2.5rem;
+          border-bottom: 1px solid var(--border-hair);
+          position: relative;
+        }
+        .menu-category-head::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -1px;
+          width: 80px;
+          height: 1px;
+          background: var(--champagne);
+        }
+        .menu-category-num {
+          font-family: var(--font-italiana);
+          font-size: 2.4rem;
+          color: var(--champagne);
+          line-height: 1;
+          opacity: 0.8;
+        }
+        .menu-category-title {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+          color: var(--pearl);
+          letter-spacing: -0.005em;
+        }
+        .menu-category-title em {
+          font-style: italic;
+          color: var(--champagne);
+        }
+
+        .menu-item {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 2rem;
+          padding: 1.5rem 0;
+          border-bottom: 1px dashed rgba(201, 169, 110, 0.1);
+          align-items: baseline;
+          transition: padding 0.5s var(--ease-silk);
+        }
+        .menu-item:last-child {
+          border-bottom: none;
+        }
+        .menu-item:hover {
+          padding-left: 1rem;
+        }
+        .menu-item-name {
+          display: flex;
+          align-items: baseline;
+          gap: 1rem;
+          flex-wrap: wrap;
+          margin-bottom: 0.45rem;
+        }
+        .menu-item-name h4 {
+          font-family: var(--font-display);
+          font-weight: 500;
+          font-size: 1.18rem;
+          color: var(--pearl);
+          letter-spacing: 0;
+        }
+        .menu-item-note {
+          font-family: var(--font-sans);
+          font-size: 0.54rem;
+          letter-spacing: 0.26em;
+          text-transform: uppercase;
+          color: var(--champagne);
+          padding: 0.25rem 0.65rem;
+          border: 1px solid rgba(201, 169, 110, 0.3);
+          font-weight: 400;
+        }
+        .menu-item-desc {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.85rem;
+          color: var(--stone);
+          line-height: 1.7;
+          max-width: 52ch;
+        }
+        .menu-item-price {
+          font-family: var(--font-display);
+          font-weight: 400;
+          font-size: 1.35rem;
+          color: var(--champagne);
+          white-space: nowrap;
+          letter-spacing: 0.01em;
+          position: relative;
+          padding-left: 1rem;
+        }
+        .menu-item-price::before {
+          content: '€';
+          font-family: var(--font-italiana);
+          font-size: 0.9em;
+          margin-right: 0.15em;
+          opacity: 0.8;
+        }
+
+        /* ── Footer of menu ── */
+        .menu-footer {
+          text-align: center;
+          margin-top: 5rem;
+          padding-top: 3.5rem;
+          border-top: 1px solid var(--border-hair);
+        }
+        .menu-footer-mark {
+          font-family: var(--font-italiana);
+          font-size: 1.1rem;
+          color: var(--champagne);
+          letter-spacing: 0.3em;
+          margin-bottom: 1.5rem;
+          text-transform: uppercase;
+        }
+        .menu-footer-quote {
+          font-family: var(--font-display);
+          font-style: italic;
+          font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+          color: var(--taupe);
+          max-width: 50ch;
+          margin: 0 auto 2rem;
+          line-height: 1.6;
+        }
+        .menu-footer-note {
+          font-family: var(--font-sans);
+          font-size: 0.58rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: var(--stone);
+        }
+        .menu-footer-note b {
+          color: var(--champagne);
+          font-weight: 400;
         }
 
         @media (max-width: 768px) {
-          .section {
-            padding: 5rem 2rem;
+          .menu-item {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+          }
+          .menu-item-price {
+            padding-left: 0;
+          }
+          .menu-category-head {
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+          .menu-tab {
+            padding: 0.9rem 1.6rem;
+            font-size: 0.58rem;
           }
         }
       `}</style>
 
-      <section className="section section-surface">
-        <div className="container">
-          <div className="menu-header">
-            <div className="eyebrow reveal">Nuestro menú</div>
-            <h1 className="section-title reveal reveal-delay-1">
-              Elige tu <em>experiencia</em>
-            </h1>
+      <section className="menu-hero">
+        <div className="menu-hero-inner">
+          <div className="eyebrow center reveal">La carta</div>
+          <h1 className="reveal reveal-delay-1">
+            Una selección
+            <br />
+            <em>cuidadosamente orquestada</em>
+          </h1>
+          <div className="ornament reveal reveal-delay-2">
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
           </div>
-          <div className="menu-tabs-wrap reveal reveal-delay-2">
-            <div className="menu-tabs">
-              <button className={`menu-tab${activeTab === 'Cafe' ? ' active' : ''}`} onClick={() => setActiveTab('Cafe')}>
-                Cafetería
-              </button>
-              <button className={`menu-tab${activeTab === 'Pizza' ? ' active' : ''}`} onClick={() => setActiveTab('Pizza')}>
-                Pizzería
-              </button>
+          <p className="reveal reveal-delay-3">
+            Dos mundos en una misma mesa. Cada preparación nace del respeto por el producto,
+            la paciencia del oficio y la alegría de compartir.
+          </p>
+        </div>
+      </section>
+
+      <div className="menu-tabs-wrap">
+        <div className="menu-tabs reveal">
+          <button
+            className={`menu-tab${activeTab === 'Cafe' ? ' active' : ''}`}
+            onClick={() => setActiveTab('Cafe')}
+          >
+            Cafetería
+            <small>— Día —</small>
+          </button>
+          <button
+            className={`menu-tab${activeTab === 'Pizza' ? ' active' : ''}`}
+            onClick={() => setActiveTab('Pizza')}
+          >
+            Pizzería
+            <small>— Noche —</small>
+          </button>
+        </div>
+      </div>
+
+      <section className="menu-body">
+        <div className="menu-body-inner">
+          {categories.map((cat, i) => (
+            <div className={`menu-category reveal reveal-delay-${(i % 3) + 1}`} key={`${activeTab}-${cat.title}`}>
+              <div className="menu-category-head">
+                <span className="menu-category-num">{cat.roman}</span>
+                <h2 className="menu-category-title">
+                  <em>{cat.title.split(' ')[0]}</em>
+                  {cat.title.split(' ').slice(1).join(' ') ? ' ' + cat.title.split(' ').slice(1).join(' ') : ''}
+                </h2>
+              </div>
+              {cat.items.map((item) => (
+                <div className="menu-item" key={item.name}>
+                  <div>
+                    <div className="menu-item-name">
+                      <h4>{item.name}</h4>
+                      {item.note && <span className="menu-item-note">{item.note}</span>}
+                    </div>
+                    <p className="menu-item-desc">{item.desc}</p>
+                  </div>
+                  <div className="menu-item-price">{item.price}</div>
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="menu-content">
-            {activeTab === 'Cafe' ? (
-              <>
-                <div className="menu-cat reveal">
-                  <h3 className="menu-section-title">Bebidas Calientes</h3>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Espresso</div>
-                      <div className="item-desc">Intenso y concentrado, doble shot</div>
-                    </div>
-                    <span className="item-price">€3,50</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Cappuccino</div>
-                      <div className="item-desc">Espresso con leche espumada y cacao</div>
-                    </div>
-                    <span className="item-price">€4,50</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Latte</div>
-                      <div className="item-desc">Espresso suave con leche cremosa</div>
-                    </div>
-                    <span className="item-price">€4,50</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Mocha</div>
-                      <div className="item-desc">Espresso con chocolate y crema batida</div>
-                    </div>
-                    <span className="item-price">€5,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Té Chai</div>
-                      <div className="item-desc">Té negro con especias y leche</div>
-                    </div>
-                    <span className="item-price">€4,00</span>
-                  </div>
-                </div>
-                <div className="menu-cat reveal reveal-delay-1">
-                  <h3 className="menu-section-title">Bebidas Frías</h3>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Cold Brew</div>
-                      <div className="item-desc">Café infusionado en frío 12 horas</div>
-                    </div>
-                    <span className="item-price">€5,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Frappé de Café</div>
-                      <div className="item-desc">Café helado cremoso y dulce</div>
-                    </div>
-                    <span className="item-price">€5,50</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Limonada Natural</div>
-                      <div className="item-desc">Limón fresco con hierbabuena</div>
-                    </div>
-                    <span className="item-price">€3,50</span>
-                  </div>
-                </div>
-                <div className="menu-cat reveal reveal-delay-2">
-                  <h3 className="menu-section-title">Repostería</h3>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Croissant de Mantequilla</div>
-                      <div className="item-desc">Horneado fresco cada mañana</div>
-                    </div>
-                    <span className="item-price">€3,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Cheesecake</div>
-                      <div className="item-desc">New York style con frutos rojos</div>
-                    </div>
-                    <span className="item-price">€5,50</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Brownie</div>
-                      <div className="item-desc">Chocolate belga con nueces</div>
-                    </div>
-                    <span className="item-price">€4,00</span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="menu-cat reveal">
-                  <h3 className="menu-section-title">Pizzas Clásicas</h3>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Margherita</div>
-                      <div className="item-desc">Salsa de tomate, mozzarella fresca y albahaca</div>
-                    </div>
-                    <span className="item-price">€10,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Pepperoni</div>
-                      <div className="item-desc">Pepperoni artesanal con mozzarella fundida</div>
-                    </div>
-                    <span className="item-price">€12,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Hawaiana</div>
-                      <div className="item-desc">Jamón, piña caramelizada y queso</div>
-                    </div>
-                    <span className="item-price">€12,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Cuatro Quesos</div>
-                      <div className="item-desc">Mozzarella, gorgonzola, parmesano y fontina</div>
-                    </div>
-                    <span className="item-price">€13,00</span>
-                  </div>
-                </div>
-                <div className="menu-cat reveal reveal-delay-1">
-                  <h3 className="menu-section-title">Pizzas Especiales</h3>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Ébenezer Suprema</div>
-                      <div className="item-desc">Carne, chorizo, pimiento, cebolla y aceitunas</div>
-                    </div>
-                    <span className="item-price">€15,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Mediterránea</div>
-                      <div className="item-desc">Tomate cherry, rúcula, jamón serrano y parmesano</div>
-                    </div>
-                    <span className="item-price">€14,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">BBQ Chicken</div>
-                      <div className="item-desc">Pollo, salsa BBQ, cebolla morada y cilantro</div>
-                    </div>
-                    <span className="item-price">€14,00</span>
-                  </div>
-                </div>
-                <div className="menu-cat reveal reveal-delay-2">
-                  <h3 className="menu-section-title">Acompañantes</h3>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Alitas BBQ</div>
-                      <div className="item-desc">8 piezas con salsa casera</div>
-                    </div>
-                    <span className="item-price">€8,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Breadsticks con Queso</div>
-                      <div className="item-desc">Pan artesanal con dip de queso</div>
-                    </div>
-                    <span className="item-price">€5,00</span>
-                  </div>
-                  <div className="menu-item">
-                    <div>
-                      <div className="item-name">Ensalada Caesar</div>
-                      <div className="item-desc">Lechuga, crutones, parmesano y aderezo</div>
-                    </div>
-                    <span className="item-price">€6,00</span>
-                  </div>
-                </div>
-              </>
-            )}
+          ))}
+
+          <div className="menu-footer">
+            <div className="menu-footer-mark">— · —</div>
+            <p className="menu-footer-quote">
+              &ldquo;La carta cambia con las estaciones. Los productores marcan el ritmo
+              y nosotros lo seguimos, con gusto.&rdquo;
+            </p>
+            <p className="menu-footer-note">
+              Consulta al equipo por <b>alérgenos</b> &nbsp;·&nbsp; Precios con <b>IVA incluido</b>
+            </p>
           </div>
         </div>
       </section>

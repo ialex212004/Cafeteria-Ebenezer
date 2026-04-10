@@ -1,8 +1,32 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+type ReservationForm = {
+  name: string;
+  phone: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: string;
+  notes: string;
+};
+
+const initialForm: ReservationForm = {
+  name: '',
+  phone: '',
+  email: '',
+  date: '',
+  time: '',
+  guests: '2',
+  notes: '',
+};
 
 export default function ContactoPage() {
+  const [form, setForm] = useState<ReservationForm>(initialForm);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) =>
@@ -12,273 +36,574 @@ export default function ContactoPage() {
             observer.unobserve(e.target);
           }
         }),
-      { threshold: 0.12 }
+      { threshold: 0.1 }
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
+  const onChange = (key: keyof ReservationForm, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setError('');
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.date || !form.time) {
+      setError('Por favor completa los campos obligatorios.');
+      return;
+    }
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setForm(initialForm);
+    }, 6000);
+  };
+
   return (
     <>
       <style jsx global>{`
-        :root {
-          --bg3: #18140d;
-          --border: rgba(210, 185, 140, 0.08);
-          --fg: #f2ece0;
-          --fg2: #a89880;
-          --fg3: #5c5040;
-          --gold: #d4a853;
-          --font-display: 'Poppins', sans-serif;
-          --font-body: 'Libre Baskerville', Georgia, serif;
-          --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        .contact-hero {
+          margin-top: var(--stack);
+          padding: clamp(6rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 5vw, 5rem);
+          text-align: center;
+          background:
+            radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201, 169, 110, 0.06) 0%, transparent 70%),
+            var(--obsidian);
         }
-
-        body {
-          color: var(--fg);
+        .contact-hero h1 {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(2.8rem, 5.4vw, 5.2rem);
+          line-height: 1.02;
+          margin: 1.5rem 0;
+          color: var(--pearl);
+          letter-spacing: -0.015em;
         }
-
-        .section {
-          padding: 7rem 2rem;
-          margin-top: 70px;
+        .contact-hero h1 em {
+          font-style: italic;
+          color: var(--champagne);
+          font-weight: 400;
         }
-        .section-surface {
-          background: var(--bg3);
-        }
-        .container {
-          max-width: 1180px;
+        .contact-hero p {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.95rem;
+          color: var(--taupe);
+          line-height: 1.9;
+          max-width: 52ch;
           margin: 0 auto;
         }
-        .eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--gold);
-          font-weight: 500;
-          margin-bottom: 1.25rem;
-        }
-        .eyebrow::before {
-          content: '';
-          width: 28px;
-          height: 1px;
-          background: var(--gold);
-        }
-        .section-title {
-          font-family: var(--font-display);
-          font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-          font-weight: 600;
-          line-height: 1.15;
-          color: var(--fg);
-        }
-        .section-title em {
-          font-style: italic;
-          color: var(--gold);
-        }
 
+        /* ── Details Grid ── */
         .contact-grid {
+          padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem);
+          background: var(--obsidian);
+        }
+        .contact-grid-inner {
+          max-width: 1240px;
+          margin: 0 auto;
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 5rem;
-          align-items: start;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0;
+          border: 1px solid var(--border-hair);
         }
-        .map-frame {
-          border: 1px solid var(--border);
-          overflow: hidden;
-          position: relative;
+        .contact-cell {
+          padding: 3rem 2.5rem;
+          text-align: center;
+          border-right: 1px solid var(--border-hair);
+          transition: background 0.6s var(--ease-silk);
         }
-        .map-frame iframe {
-          display: block;
-          width: 100%;
-          height: 400px;
-          border: 0;
-          filter: invert(1) hue-rotate(180deg) brightness(0.85) saturate(0.6);
+        .contact-cell:last-child {
+          border-right: none;
         }
-        .contact-info .section-title {
-          margin-bottom: 2.5rem;
+        .contact-cell:hover {
+          background: rgba(201, 169, 110, 0.03);
         }
-        .contact-row {
-          display: flex;
-          gap: 1.25rem;
-          padding: 1.25rem 0;
-          border-bottom: 1px solid var(--border);
-        }
-        .contact-icon-box {
-          width: 2.5rem;
-          height: 2.5rem;
-          flex-shrink: 0;
-          border: 1px solid var(--border);
+        .contact-cell-icon {
+          width: 48px;
+          height: 48px;
+          margin: 0 auto 1.5rem;
+          border: 1px solid var(--border-soft);
+          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: border-color 0.6s, transform 0.6s var(--ease-silk);
         }
-        .contact-icon-box svg {
-          width: 1rem;
-          height: 1rem;
-          stroke: var(--gold);
+        .contact-cell:hover .contact-cell-icon {
+          border-color: var(--champagne);
+          transform: scale(1.08);
+        }
+        .contact-cell-icon svg {
+          width: 20px;
+          height: 20px;
+          stroke: var(--champagne);
           fill: none;
-          stroke-width: 1.5;
+          stroke-width: 1.4;
           stroke-linecap: round;
           stroke-linejoin: round;
         }
-        .contact-row h4 {
-          font-size: 0.72rem;
-          letter-spacing: 0.12em;
+        .contact-cell-label {
+          font-family: var(--font-sans);
+          font-size: 0.56rem;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: var(--fg3);
-          margin-bottom: 0.4rem;
+          color: var(--champagne);
+          margin-bottom: 0.85rem;
         }
-        .contact-row p,
-        .contact-row a {
-          font-size: 0.9rem;
-          color: var(--fg2);
-          line-height: 1.6;
-          transition: color 0.2s;
-          text-decoration: none;
+        .contact-cell-value {
+          font-family: var(--font-display);
+          font-size: 1.15rem;
+          color: var(--pearl);
+          line-height: 1.5;
+          letter-spacing: 0;
         }
-        .contact-row a:hover {
-          color: var(--gold);
+        .contact-cell-value a {
+          color: var(--pearl);
+          transition: color 0.3s;
         }
-        .social-row {
+        .contact-cell-value a:hover {
+          color: var(--champagne);
+        }
+        .contact-cell-value em {
+          font-style: italic;
+          color: var(--champagne);
+        }
+
+        /* ── Form + Map ── */
+        .contact-main {
+          padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem);
+          background: linear-gradient(180deg, var(--obsidian) 0%, var(--onyx) 100%);
+          border-top: 1px solid var(--border-hair);
+        }
+        .contact-main-inner {
+          max-width: 1240px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1.1fr 1fr;
+          gap: clamp(3rem, 6vw, 6rem);
+          align-items: start;
+        }
+        .contact-main-head h2 {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(2rem, 3.6vw, 3.2rem);
+          line-height: 1.1;
+          color: var(--pearl);
+          margin: 1.5rem 0 1.5rem;
+        }
+        .contact-main-head h2 em {
+          font-style: italic;
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .contact-main-head p {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.92rem;
+          color: var(--taupe);
+          line-height: 1.9;
+          max-width: 46ch;
+          margin-bottom: 2.5rem;
+        }
+
+        .reservation-form {
+          background: rgba(12, 9, 5, 0.72);
+          border: 1px solid var(--border-hair);
+          padding: 2.5rem;
+        }
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+        }
+        .form-row.three {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+        .form-field {
           display: flex;
-          gap: 0.75rem;
-          margin-top: 2rem;
+          flex-direction: column;
+          gap: 0.6rem;
+          margin-bottom: 1.6rem;
         }
-        .social-btn {
-          width: 2.75rem;
-          height: 2.75rem;
-          border: 1px solid var(--border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--fg3);
-          transition: border-color 0.25s, color 0.25s, transform 0.25s;
+        .form-field label {
+          font-family: var(--font-sans);
+          font-size: 0.54rem;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .form-field input,
+        .form-field textarea,
+        .form-field select {
           background: transparent;
-          text-decoration: none;
+          border: none;
+          border-bottom: 1px solid var(--border-soft);
+          color: var(--pearl);
+          padding: 0.65rem 0 0.85rem;
+          font-family: var(--font-serif);
+          font-size: 0.95rem;
+          outline: none;
+          transition: border-color 0.4s var(--ease-silk);
+          font-style: italic;
+          width: 100%;
         }
-        .social-btn:hover {
-          border-color: var(--gold);
-          color: var(--gold);
-          transform: translateY(-3px);
+        .form-field input[type='date'],
+        .form-field input[type='time'],
+        .form-field select {
+          font-family: var(--font-sans);
+          font-style: normal;
+          font-size: 0.88rem;
+          color-scheme: dark;
         }
-        .social-btn svg {
-          width: 1rem;
-          height: 1rem;
-          fill: currentColor;
+        .form-field input:focus,
+        .form-field textarea:focus,
+        .form-field select:focus {
+          border-bottom-color: var(--champagne);
+        }
+        .form-field textarea {
+          resize: none;
+          min-height: 80px;
+        }
+        .form-field input::placeholder,
+        .form-field textarea::placeholder {
+          color: var(--stone);
+          font-style: italic;
         }
 
-        .reveal {
-          opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+        .form-submit {
+          margin-top: 1rem;
         }
-        .reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
+        .form-feedback {
+          margin-top: 1.25rem;
+          padding: 1rem 1.25rem;
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.85rem;
+          color: var(--ivory);
+          border-left: 2px solid var(--champagne);
+          background: rgba(201, 169, 110, 0.05);
         }
-        .reveal-delay-1 {
-          transition-delay: 0.1s;
-        }
-        .reveal-delay-2 {
-          transition-delay: 0.2s;
-        }
-        .reveal-delay-3 {
-          transition-delay: 0.3s;
+        .form-feedback.error {
+          border-color: #c65a3c;
+          background: rgba(180, 92, 50, 0.08);
         }
 
-        @media (max-width: 768px) {
-          .section {
-            padding: 5rem 1.25rem;
-          }
-          .contact-grid {
+        /* ── Map ── */
+        .contact-map-section {
+          padding: clamp(4rem, 6vw, 6rem) 0 0;
+          background: var(--onyx);
+          border-top: 1px solid var(--border-hair);
+        }
+        .map-title {
+          text-align: center;
+          padding: 0 clamp(1.5rem, 5vw, 5rem) 3rem;
+        }
+        .map-title h2 {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(1.8rem, 3vw, 2.6rem);
+          color: var(--pearl);
+          margin-top: 1.5rem;
+          line-height: 1.1;
+        }
+        .map-title h2 em {
+          font-style: italic;
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .map-wrap {
+          position: relative;
+          width: 100%;
+          height: 520px;
+          overflow: hidden;
+          border-top: 1px solid var(--border-hair);
+          border-bottom: 1px solid var(--border-hair);
+        }
+        .map-wrap iframe {
+          width: 100%;
+          height: 100%;
+          border: 0;
+          filter: invert(0.92) hue-rotate(170deg) brightness(0.95) saturate(0.55) contrast(0.92);
+        }
+        .map-wrap::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at center, transparent 30%, rgba(8, 6, 3, 0.45) 100%);
+          pointer-events: none;
+        }
+        .map-pin {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -100%);
+          pointer-events: none;
+          z-index: 2;
+          text-align: center;
+        }
+        .map-pin-dot {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: var(--champagne);
+          margin: 0 auto;
+          position: relative;
+          box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.22), 0 0 24px rgba(201, 169, 110, 0.5);
+        }
+        .map-pin-dot::before {
+          content: '';
+          position: absolute;
+          inset: -8px;
+          border-radius: 50%;
+          border: 1px solid var(--champagne);
+          animation: pinPulse 2.5s ease-out infinite;
+        }
+        .map-pin-label {
+          margin-top: 12px;
+          padding: 0.6rem 1rem;
+          background: rgba(8, 6, 3, 0.92);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--border-soft);
+          font-family: var(--font-italiana);
+          font-size: 0.9rem;
+          color: var(--champagne);
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+        @keyframes pinPulse {
+          0% { opacity: 0.7; transform: scale(1); }
+          100% { opacity: 0; transform: scale(2.8); }
+        }
+
+        @media (max-width: 900px) {
+          .contact-grid-inner {
             grid-template-columns: 1fr;
-            gap: 3rem;
+          }
+          .contact-cell {
+            border-right: none;
+            border-bottom: 1px solid var(--border-hair);
+          }
+          .contact-cell:last-child {
+            border-bottom: none;
+          }
+          .contact-main-inner {
+            grid-template-columns: 1fr;
+          }
+          .form-row,
+          .form-row.three {
+            grid-template-columns: 1fr;
+            gap: 0;
+          }
+          .map-wrap {
+            height: 400px;
+          }
+          .reservation-form {
+            padding: 1.75rem;
           }
         }
       `}</style>
 
-      <section className="section section-surface">
-        <div className="container">
-          <div className="contact-grid">
-            <div className="map-frame reveal">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3111.0!2d-3.3844!3d39.0074!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMznCsDAwJzI2LjciTiAzwrAyMyczMC4yIlc!5e0!3m2!1ses!2ses!4v1234567890"
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Ubicación Cafetería Ébenezer"
+      {submitted && (
+        <></>
+      )}
+
+      <section className="contact-hero">
+        <div className="eyebrow center reveal">Te esperamos</div>
+        <h1 className="reveal reveal-delay-1">
+          Reserva tu
+          <br />
+          <em>experiencia</em>
+        </h1>
+        <p className="reveal reveal-delay-2">
+          Una mesa en Ébenezer es una invitación al disfrute pausado. Nuestro equipo estará
+          encantado de recibirte con la delicadeza que mereces.
+        </p>
+      </section>
+
+      <section className="contact-grid">
+        <div className="contact-grid-inner">
+          <div className="contact-cell reveal reveal-delay-1">
+            <div className="contact-cell-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <div className="contact-cell-label">Dirección</div>
+            <div className="contact-cell-value">
+              Calle la Paz, 28-A
+              <br />
+              <em>13300 Valdepeñas</em>
+            </div>
+          </div>
+          <div className="contact-cell reveal reveal-delay-2">
+            <div className="contact-cell-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </div>
+            <div className="contact-cell-label">Horarios</div>
+            <div className="contact-cell-value">
+              <em>08:00 — 23:00</em>
+              <br />
+              Todos los días
+            </div>
+          </div>
+          <div className="contact-cell reveal reveal-delay-3">
+            <div className="contact-cell-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.59 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+            </div>
+            <div className="contact-cell-label">Reservas</div>
+            <div className="contact-cell-value">
+              <a href="tel:+34623272728">+34 623 272 728</a>
+              <br />
+              <em>reservas@ebenezer</em>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="contact-main">
+        <div className="contact-main-inner">
+          <div className="contact-main-head">
+            <div className="eyebrow reveal">Formulario de reserva</div>
+            <h2 className="reveal reveal-delay-1">
+              Reserva
+              <br />
+              <em>tu mesa</em>
+            </h2>
+            <p className="reveal reveal-delay-2">
+              Indícanos tus datos y la hora deseada. Nuestro equipo confirmará tu reserva
+              en menos de dos horas. Para ocasiones especiales, no dudes en dejarnos una nota.
+            </p>
+            <p className="reveal reveal-delay-2" style={{ fontStyle: 'normal', fontFamily: 'var(--font-sans)', fontSize: '0.58rem', letterSpacing: '0.26em', textTransform: 'uppercase', color: 'var(--stone)' }}>
+              Para grupos de más de <span style={{ color: 'var(--champagne)' }}>8 personas</span>, recomendamos llamar directamente.
+            </p>
+          </div>
+
+          <form className="reservation-form reveal reveal-delay-2" onSubmit={onSubmit}>
+            <div className="form-row">
+              <div className="form-field">
+                <label>Nombre completo *</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => onChange('name', e.target.value)}
+                  placeholder="Su nombre"
+                  required
+                />
+              </div>
+              <div className="form-field">
+                <label>Teléfono *</label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => onChange('phone', e.target.value)}
+                  placeholder="+34 600 000 000"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label>Correo electrónico</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => onChange('email', e.target.value)}
+                placeholder="correo@ejemplo.com"
               />
             </div>
-            <div className="contact-info">
-              <div className="eyebrow reveal">Visítanos</div>
-              <h1 className="section-title reveal reveal-delay-1">
-                Te <em>esperamos</em>
-              </h1>
-              <div className="contact-row reveal reveal-delay-2">
-                <div className="contact-icon-box">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                </div>
-                <div>
-                  <h2>Dirección</h2>
-                  <p>Calle la Paz, 28-A · Valdepeñas, 13300 · Ciudad Real, España</p>
-                </div>
+
+            <div className="form-row three">
+              <div className="form-field">
+                <label>Fecha *</label>
+                <input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => onChange('date', e.target.value)}
+                  required
+                />
               </div>
-              <div className="contact-row reveal reveal-delay-2">
-                <div className="contact-icon-box">
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                </div>
-                <div>
-                  <h2>Horarios</h2>
-                  <p>
-                    Lunes a Domingo: 08:00 – 23:00
-                    <br />
-                    Servicio continuo
-                  </p>
-                </div>
+              <div className="form-field">
+                <label>Hora *</label>
+                <input
+                  type="time"
+                  value={form.time}
+                  onChange={(e) => onChange('time', e.target.value)}
+                  required
+                />
               </div>
-              <div className="contact-row reveal reveal-delay-3">
-                <div className="contact-icon-box">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.59 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2>Teléfono</h2>
-                  <a href="tel:+34623272728">+34 623 272 728</a>
-                </div>
-              </div>
-              <div className="social-row reveal reveal-delay-3">
-                <a
-                  href="https://wa.me/34623272728?text=Hola%2C%20me%20gustaría%20obtener%20más%20información"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-btn"
-                  title="WhatsApp"
+              <div className="form-field">
+                <label>Comensales</label>
+                <select
+                  value={form.guests}
+                  onChange={(e) => onChange('guests', e.target.value)}
                 >
-                  <svg viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.instagram.com/ebenezer_valdepenas/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-btn"
-                  title="Instagram"
-                >
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                  </svg>
-                </a>
+                  {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={n}>
+                      {n} {n === 1 ? 'persona' : 'personas'}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
+
+            <div className="form-field">
+              <label>Ocasión especial o notas</label>
+              <textarea
+                value={form.notes}
+                onChange={(e) => onChange('notes', e.target.value)}
+                rows={3}
+                placeholder="Aniversario, cumpleaños, alergias..."
+              />
+            </div>
+
+            <div className="form-submit">
+              <button className="lux-btn" type="submit">
+                <span>Solicitar reserva</span>
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+
+            {submitted && (
+              <div className="form-feedback">
+                Gracias, {form.name}. Tu solicitud ha sido recibida. Te confirmaremos la reserva
+                en breve por teléfono.
+              </div>
+            )}
+            {error && <div className="form-feedback error">{error}</div>}
+          </form>
+        </div>
+      </section>
+
+      <section className="contact-map-section">
+        <div className="map-title">
+          <div className="eyebrow center reveal">Cómo encontrarnos</div>
+          <h2 className="reveal reveal-delay-1">
+            En el corazón de <em>Valdepeñas</em>
+          </h2>
+        </div>
+        <div className="map-wrap">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3116.5!2d-3.3838!3d38.7602!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDQ1JzM2LjciTiAzwrAyMyczMC4yIlc!5e0!3m2!1ses!2ses!4v1740000000"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Ubicación Cafetería Ébenezer"
+          />
+          <div className="map-pin" aria-hidden="true">
+            <div className="map-pin-dot" />
+            <div className="map-pin-label">Ébenezer</div>
           </div>
         </div>
       </section>

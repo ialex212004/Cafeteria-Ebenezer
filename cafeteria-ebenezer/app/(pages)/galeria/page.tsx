@@ -1,10 +1,78 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+type GalleryImage = {
+  src: string;
+  alt: string;
+  label: string;
+  caption: string;
+  index: string;
+};
+
+const images: GalleryImage[] = [
+  {
+    src: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Latte art de la casa',
+    label: 'Arte líquido',
+    caption: 'Cada taza, una composición efímera',
+    index: '01',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Croissants recién horneados',
+    label: 'Repostería',
+    caption: 'Mantequilla francesa, hojaldrado paciente',
+    index: '02',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Espresso siendo extraído',
+    label: 'Extracción',
+    caption: 'Veinticinco segundos, la medida exacta',
+    index: '03',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Pizza margherita',
+    label: 'Margherita D.O.P.',
+    caption: 'Tomate San Marzano y burrata',
+    index: '04',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Horno de piedra',
+    label: 'Horno de piedra',
+    caption: 'Cuatrocientos ochenta grados',
+    index: '05',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Sala principal del restaurante',
+    label: 'La sala',
+    caption: 'Luz cálida, pausa obligatoria',
+    index: '06',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Mesa servida',
+    label: 'La mesa',
+    caption: 'Todo servido con devoción',
+    index: '07',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Barra del café',
+    label: 'La barra',
+    caption: 'El corazón que nunca descansa',
+    index: '08',
+  },
+];
 
 export default function GaleriaPage() {
-  const galleryTrackRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,84 +89,90 @@ export default function GaleriaPage() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollGallery = (dir: number) =>
-    galleryTrackRef.current?.scrollBy({ left: dir * 300, behavior: 'smooth' });
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const onScroll = () => {
+      const cards = track.querySelectorAll<HTMLDivElement>('.gal-card');
+      const center = track.scrollLeft + track.clientWidth / 2;
+      let closest = 0;
+      let dist = Infinity;
+      cards.forEach((card, i) => {
+        const mid = card.offsetLeft + card.offsetWidth / 2;
+        const d = Math.abs(center - mid);
+        if (d < dist) {
+          dist = d;
+          closest = i;
+        }
+      });
+      setActiveIdx(closest);
+    };
+    track.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => track.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollBy = (dir: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector<HTMLDivElement>('.gal-card');
+    if (!card) return;
+    const amount = card.offsetWidth + 24;
+    track.scrollBy({ left: dir * amount, behavior: 'smooth' });
+  };
 
   return (
     <>
       <style jsx global>{`
-        :root {
-          --bg2: #131009;
-          --border: rgba(210, 185, 140, 0.08);
-          --border2: rgba(210, 185, 140, 0.16);
-          --fg: #f2ece0;
-          --fg2: #a89880;
-          --fg3: #5c5040;
-          --gold: #d4a853;
-          --font-display: 'Poppins', sans-serif;
-          --font-body: 'Libre Baskerville', Georgia, serif;
-          --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        .gallery-hero {
+          margin-top: var(--stack);
+          padding: clamp(6rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 5vw, 5rem);
+          text-align: center;
+          background:
+            radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201, 169, 110, 0.06) 0%, transparent 70%),
+            var(--obsidian);
         }
-
-        body {
-          color: var(--fg);
+        .gallery-hero h1 {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(2.8rem, 5.4vw, 5.2rem);
+          line-height: 1.02;
+          margin: 1.5rem 0 1.5rem;
+          color: var(--pearl);
+          letter-spacing: -0.015em;
         }
-
-        .section {
-          padding: 7rem 2rem;
-          margin-top: 70px;
+        .gallery-hero h1 em {
+          font-style: italic;
+          color: var(--champagne);
+          font-weight: 400;
         }
-        .section-dark {
-          background: var(--bg2);
-          background-image: radial-gradient(ellipse 80% 60% at 10% 20%, rgba(212, 168, 83, 0.04) 0%, transparent 70%),
-            radial-gradient(ellipse 60% 40% at 90% 80%, rgba(168, 50, 40, 0.05) 0%, transparent 70%);
-        }
-        .container {
-          max-width: 1180px;
+        .gallery-hero p {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.95rem;
+          color: var(--taupe);
+          line-height: 1.9;
+          max-width: 52ch;
           margin: 0 auto;
         }
-        .eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--gold);
-          font-weight: 500;
-          margin-bottom: 1.25rem;
-        }
-        .eyebrow::before {
-          content: '';
-          width: 28px;
-          height: 1px;
-          background: var(--gold);
-        }
-        .section-title {
-          font-family: var(--font-display);
-          font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-          font-weight: 600;
-          line-height: 1.15;
-          color: var(--fg);
-        }
-        .section-title em {
-          font-style: italic;
-          color: var(--gold);
-        }
 
-        .gallery-header {
-          margin-bottom: 3rem;
+        .gallery-stage {
+          position: relative;
+          padding: clamp(3rem, 5vw, 5rem) 0 4rem;
+          background: var(--obsidian);
         }
         .gallery-track-wrap {
+          position: relative;
           overflow: hidden;
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
-          mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+          padding: 2rem 0;
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
         }
         .gallery-track {
           display: flex;
-          gap: 1rem;
+          gap: 1.5rem;
           overflow-x: auto;
-          padding: 0 2rem 1rem;
+          padding: 0 clamp(1.5rem, 8vw, 8vw);
           scrollbar-width: none;
           scroll-snap-type: x mandatory;
           scroll-behavior: smooth;
@@ -106,131 +180,248 @@ export default function GaleriaPage() {
         .gallery-track::-webkit-scrollbar {
           display: none;
         }
-        .gallery-card {
-          flex-shrink: 0;
-          width: 280px;
-          scroll-snap-align: start;
+        .gal-card {
           position: relative;
+          flex-shrink: 0;
+          width: clamp(280px, 34vw, 460px);
+          aspect-ratio: 3 / 4;
+          scroll-snap-align: center;
           overflow: hidden;
-          border: 1px solid var(--border);
+          cursor: pointer;
+          transition: transform 1s var(--ease-silk), filter 1s var(--ease-silk);
+          filter: brightness(0.6) saturate(0.75);
+          transform: scale(0.94);
         }
-        .gallery-card img {
-          width: 100%;
-          aspect-ratio: 3/4;
-          object-fit: cover;
-          display: block;
-          filter: brightness(0.75) saturate(0.8);
-          transition: transform 0.7s var(--ease-smooth), filter 0.5s;
+        .gal-card.active {
+          transform: scale(1);
+          filter: brightness(0.92) saturate(1.02);
         }
-        .gallery-card:hover img {
-          transform: scale(1.06);
-          filter: brightness(0.9) saturate(1.1);
-        }
-        .gallery-card-label {
+        .gal-card::before {
+          content: '';
           position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 1.5rem 1rem 1rem;
-          background: linear-gradient(to top, rgba(10, 10, 15, 0.9) 0%, transparent 100%);
-          font-size: 0.72rem;
+          inset: 0;
+          border: 1px solid var(--border-hair);
+          z-index: 3;
+          pointer-events: none;
+          transition: border-color 0.6s;
+        }
+        .gal-card.active::before {
+          border-color: var(--border-bright);
+        }
+        .gal-card img {
+          position: absolute !important;
+          inset: 0;
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover;
+          transition: transform 2s var(--ease-silk);
+        }
+        .gal-card:hover img {
+          transform: scale(1.05);
+        }
+        .gal-card-index {
+          position: absolute;
+          top: 1.25rem;
+          left: 1.25rem;
+          font-family: var(--font-italiana);
+          font-size: 1.1rem;
+          color: var(--champagne);
           letter-spacing: 0.1em;
+          z-index: 3;
+          padding: 0.35rem 0.75rem;
+          background: rgba(8, 6, 3, 0.7);
+          backdrop-filter: blur(8px);
+          border: 1px solid var(--border-soft);
+        }
+        .gal-card-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          background: linear-gradient(180deg, transparent 30%, rgba(8, 6, 3, 0.92) 100%);
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          padding: 2rem 1.75rem 1.75rem;
+        }
+        .gal-card-label {
+          font-family: var(--font-sans);
+          font-size: 0.58rem;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: var(--fg2);
-          transform: translateY(4px);
-          transition: transform 0.3s;
+          color: var(--champagne);
+          margin-bottom: 0.65rem;
         }
-        .gallery-card:hover .gallery-card-label {
-          transform: translateY(0);
-          color: var(--fg);
+        .gal-card-title {
+          font-family: var(--font-display);
+          font-weight: 400;
+          font-size: 1.4rem;
+          color: var(--pearl);
+          line-height: 1.1;
+          margin-bottom: 0.6rem;
+          letter-spacing: 0;
         }
+        .gal-card-title em {
+          font-style: italic;
+          color: var(--champagne);
+        }
+        .gal-card-caption {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.78rem;
+          color: var(--taupe);
+          line-height: 1.6;
+        }
+
+        /* Navigation */
         .gallery-nav {
           display: flex;
           justify-content: center;
-          gap: 0.75rem;
-          margin-top: 2rem;
+          align-items: center;
+          gap: 2.5rem;
+          padding: 2rem;
         }
-        .gallery-nav button {
-          width: 2.5rem;
-          height: 2.5rem;
-          border: 1px solid var(--border2);
+        .gal-nav-btn {
+          width: 3.2rem;
+          height: 3.2rem;
+          border: 1px solid var(--border-soft);
           background: transparent;
-          color: var(--fg2);
+          color: var(--taupe);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.25s;
+          transition: all 0.55s var(--ease-silk);
+          border-radius: 50%;
         }
-        .gallery-nav button:hover {
-          border-color: var(--gold);
-          color: var(--gold);
+        .gal-nav-btn:hover {
+          border-color: var(--champagne);
+          color: var(--champagne);
+          background: rgba(201, 169, 110, 0.06);
+          transform: scale(1.06);
         }
-        .gallery-nav button svg {
+        .gal-nav-btn svg {
           width: 16px;
           height: 16px;
         }
+        .gal-nav-counter {
+          font-family: var(--font-display);
+          font-size: 1.1rem;
+          color: var(--pearl);
+          letter-spacing: 0.05em;
+          min-width: 70px;
+          text-align: center;
+          display: flex;
+          align-items: baseline;
+          justify-content: center;
+          gap: 0.3em;
+        }
+        .gal-nav-counter b {
+          font-family: var(--font-italiana);
+          font-size: 1.6rem;
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .gal-nav-counter i {
+          font-style: normal;
+          color: var(--stone);
+          font-size: 0.85rem;
+        }
 
-        .reveal {
-          opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+        /* Gallery footer */
+        .gallery-footer {
+          padding: clamp(5rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem);
+          text-align: center;
+          background: linear-gradient(180deg, var(--obsidian) 0%, var(--onyx) 100%);
+          border-top: 1px solid var(--border-hair);
         }
-        .reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
+        .gallery-footer h2 {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+          line-height: 1.2;
+          color: var(--pearl);
+          margin-top: 1.5rem;
+          margin-bottom: 2rem;
         }
-        .reveal-delay-1 {
-          transition-delay: 0.1s;
+        .gallery-footer h2 em {
+          font-style: italic;
+          color: var(--champagne);
+          font-weight: 400;
         }
 
         @media (max-width: 768px) {
-          .section {
-            padding: 5rem 1.25rem;
+          .gal-card {
+            width: 78vw;
           }
-          .gallery-card {
-            width: 240px;
+          .gal-card-title {
+            font-size: 1.2rem;
           }
         }
       `}</style>
 
-      <section className="section section-dark">
-        <div className="container">
-          <div className="gallery-header">
-            <div className="eyebrow reveal">La experiencia</div>
-            <h1 className="section-title reveal reveal-delay-1">
-              Momentos que nos <em>definen</em>
-            </h1>
-          </div>
-        </div>
+      <section className="gallery-hero">
+        <div className="eyebrow center reveal">La galería</div>
+        <h1 className="reveal reveal-delay-1">
+          Momentos que
+          <br />
+          <em>nos definen</em>
+        </h1>
+        <p className="reveal reveal-delay-2">
+          Una selección de instantes dentro de Ébenezer. Luz cálida, manos atareadas,
+          platos que pasan, miradas cómplices. Lo que somos, en imágenes.
+        </p>
+      </section>
+
+      <section className="gallery-stage">
         <div className="gallery-track-wrap">
-          <div className="gallery-track" ref={galleryTrackRef}>
-            {[
-              { src: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', alt: 'Latte art', label: 'Café de especialidad' },
-              { src: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', alt: 'Croissant', label: 'Repostería artesanal' },
-              { src: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', alt: 'Espresso', label: 'Espresso perfecto' },
-              { src: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', alt: 'Pizza', label: 'Pizza margherita' },
-              { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', alt: 'Pizza artesanal', label: 'Horno de piedra' },
-              { src: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', alt: 'Ambiente', label: 'Nuestro ambiente' },
-            ].map((img) => (
-              <div key={img.alt} className="gallery-card">
-                <Image src={img.src} alt={img.alt} width={600} height={800} sizes="(max-width: 768px) 240px, 280px" />
-                <div className="gallery-card-label">{img.label}</div>
+          <div className="gallery-track" ref={trackRef}>
+            {images.map((img, i) => (
+              <div key={img.alt} className={`gal-card${i === activeIdx ? ' active' : ''}`}>
+                <div className="gal-card-index">{img.index}</div>
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  width={1200}
+                  height={1600}
+                  sizes="(max-width: 768px) 78vw, 34vw"
+                />
+                <div className="gal-card-overlay">
+                  <div className="gal-card-label">— {img.label}</div>
+                  <h3 className="gal-card-title">{img.alt}</h3>
+                  <p className="gal-card-caption">{img.caption}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
         <div className="gallery-nav">
-          <button onClick={() => scrollGallery(-1)} aria-label="Anterior">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <button onClick={() => scrollBy(-1)} className="gal-nav-btn" aria-label="Imagen anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
-          <button onClick={() => scrollGallery(1)} aria-label="Siguiente">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="gal-nav-counter">
+            <b>{String(activeIdx + 1).padStart(2, '0')}</b>
+            <i>/ {String(images.length).padStart(2, '0')}</i>
+          </div>
+          <button onClick={() => scrollBy(1)} className="gal-nav-btn" aria-label="Imagen siguiente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </button>
         </div>
+      </section>
+
+      <section className="gallery-footer">
+        <div className="eyebrow center reveal">La mejor imagen</div>
+        <h2 className="reveal reveal-delay-1">
+          ...es la que haces <em>en persona</em>
+        </h2>
+        <a href="/contacto" className="lux-btn reveal reveal-delay-2">
+          <span>Reserva tu visita</span>
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
       </section>
     </>
   );

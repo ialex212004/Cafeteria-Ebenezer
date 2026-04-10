@@ -4,34 +4,78 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Review = {
   name: string;
+  city: string;
   text: string;
   stars: number;
-  avatarStyle: string;
+  date: string;
 };
 
 const initialReviews: Review[] = [
-  { name: 'María González', text: 'El café de especialidad es simplemente increíble, es digno de fotografiar. ¡Voy cada sabado sin falta!', stars: 5, avatarStyle: 'background:rgba(212,168,83,0.15);color:var(--gold2)' },
-  { name: 'Carlos Ruiz', text: 'El desayuno Eden es algo de lo que no me olvidare. 10/10, ingredientes frescos y ese ambiente tan especial.', stars: 5, avatarStyle: 'background:rgba(168,50,40,0.15);color:var(--red2)' },
-  { name: 'Ana Martínez', text: 'Me encanta que puedo desayunar rico por la mañana y cenar pizza de noche en el mismo lugar. El croissant es el mejor que he probado.', stars: 4, avatarStyle: 'background:rgba(212,168,83,0.1);color:var(--gold)' },
-  { name: 'Luis Herrera', text: 'Vine una vez por recomendación y ya no puedo dejar de venir cada semana.', stars: 5, avatarStyle: 'background:rgba(212,168,83,0.15);color:var(--gold2)' },
-  { name: 'Sofía Peña', text: 'Las pizzas que venden son una obra maestra. El ambiente, la música, el servicio… todo perfecto.', stars: 5, avatarStyle: 'background:rgba(168,50,40,0.15);color:var(--red2)' },
-  { name: 'Roberto Díaz', text: 'Pido cada mañana camino al trabajo. Un lugar que se convierte en parte de tu rutina, Me encanta.', stars: 5, avatarStyle: 'background:rgba(212,168,83,0.12);color:var(--gold)' },
+  {
+    name: 'María González',
+    city: 'Madrid',
+    text: 'Un café tan cuidado que se convierte en ritual. Vuelves no por el sabor, sino por esa sensación de que alguien ha pensado en ti.',
+    stars: 5,
+    date: 'Marzo 2026',
+  },
+  {
+    name: 'Carlos Ruiz',
+    city: 'Valencia',
+    text: 'La masa de la pizza Tartufo Nero es una declaración. Años investigando pizzerías y puedo decir que Ébenezer está entre las mejores de España.',
+    stars: 5,
+    date: 'Febrero 2026',
+  },
+  {
+    name: 'Ana Martínez',
+    city: 'Valdepeñas',
+    text: 'Vengo cada mañana desde hace meses. No sé si el café es mejor que la tarta de queso o al revés. Solo sé que es mi lugar favorito del mundo.',
+    stars: 5,
+    date: 'Febrero 2026',
+  },
+  {
+    name: 'Luis Herrera',
+    city: 'Toledo',
+    text: 'Conduje dos horas solo para probar la burrata di Andria. Volvería a hacerlo mañana. Un servicio elegante sin pretensiones.',
+    stars: 5,
+    date: 'Enero 2026',
+  },
+  {
+    name: 'Sofía Peña',
+    city: 'Albacete',
+    text: 'La atmósfera es como un abrazo cálido. Cena de aniversario reservada al instante. El flat white perfecto y la pizza Margherita sublime.',
+    stars: 5,
+    date: 'Enero 2026',
+  },
+  {
+    name: 'Roberto Díaz',
+    city: 'Ciudad Real',
+    text: 'Cada detalle cuidado, desde la cristalería hasta la música. Un ejercicio de hospitalidad que raras veces se ve por estos lares.',
+    stars: 5,
+    date: 'Diciembre 2025',
+  },
 ];
 
-function starsText(value: number) {
-  return `${'★'.repeat(value)}${'☆'.repeat(5 - value)}`;
+function stars(n: number) {
+  return '★'.repeat(n) + '☆'.repeat(5 - n);
 }
 
-export default function ReseniasPage() {
+export default function ResenasPage() {
   const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
   const [name, setName] = useState('');
+  const [city, setCity] = useState('');
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
   const [messageError, setMessageError] = useState(false);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [loading, setLoading] = useState(false);
   const messageTimeoutRef = useRef<number | null>(null);
 
   const duplicatedReviews = useMemo(() => [...reviews, ...reviews], [reviews]);
+  const avgStars = useMemo(() => {
+    if (reviews.length === 0) return 5;
+    return reviews.reduce((s, r) => s + r.stars, 0) / reviews.length;
+  }, [reviews]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -48,123 +92,134 @@ export default function ReseniasPage() {
     return () => observer.disconnect();
   }, []);
 
-  const submitReview = () => {
-    const n = name.trim(),
-      t = text.trim();
+  const submitReview = async () => {
+    const n = name.trim();
+    const t = text.trim();
+    const c = city.trim();
     if (!n || !t) {
       setMessageError(true);
-      setMessage('Por favor completa tu nombre y reseña.');
+      setMessage('Por favor, comparte tu nombre y tu experiencia.');
       return;
     }
-    const styles = [
-      'background:rgba(212,168,83,0.15);color:var(--gold2)',
-      'background:rgba(168,50,40,0.15);color:var(--red2)',
-      'background:rgba(212,168,83,0.1);color:var(--gold)',
-    ];
+    setLoading(true);
     setReviews((prev) => [
-      { name: n, text: t, stars: rating, avatarStyle: styles[Math.floor(Math.random() * styles.length)] },
+      { name: n, city: c || 'Visitante', text: t, stars: rating, date: 'Hoy' },
       ...prev,
     ]);
     setName('');
+    setCity('');
     setText('');
     setRating(5);
     setMessageError(false);
-    setMessage(`¡Gracias ${n}! Tu reseña aparece en el carrusel.`);
-    if (messageTimeoutRef.current) {
-      window.clearTimeout(messageTimeoutRef.current);
-    }
-    messageTimeoutRef.current = window.setTimeout(() => setMessage(''), 4000);
+    setMessage(`Gracias, ${n}. Tu reseña ha sido recibida.`);
+    setLoading(false);
+    if (messageTimeoutRef.current) window.clearTimeout(messageTimeoutRef.current);
+    messageTimeoutRef.current = window.setTimeout(() => setMessage(''), 5000);
   };
 
   useEffect(() => {
     return () => {
-      if (messageTimeoutRef.current) {
-        window.clearTimeout(messageTimeoutRef.current);
-      }
+      if (messageTimeoutRef.current) window.clearTimeout(messageTimeoutRef.current);
     };
   }, []);
 
   return (
     <>
       <style jsx global>{`
-        :root {
-          --bg3: #18140d;
-          --surface: #201a11;
-          --border: rgba(210, 185, 140, 0.08);
-          --fg: #f2ece0;
-          --fg2: #a89880;
-          --fg3: #5c5040;
-          --gold: #d4a853;
-          --gold2: #edc97a;
-          --gold-dim: rgba(212, 168, 83, 0.12);
-          --red2: #d4503f;
-          --red-dim: rgba(168, 50, 40, 0.14);
-          --font-display: 'Poppins', sans-serif;
-          --font-body: 'Libre Baskerville', Georgia, serif;
-          --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        .res-hero {
+          margin-top: var(--stack);
+          padding: clamp(6rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 5vw, 5rem);
+          text-align: center;
+          background:
+            radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201, 169, 110, 0.06) 0%, transparent 70%),
+            var(--obsidian);
         }
-
-        body {
-          color: var(--fg);
-        }
-
-        .section {
-          padding: 7rem 2rem;
-          margin-top: 70px;
-        }
-        .section-surface {
-          background: var(--bg3);
-        }
-        .container {
-          max-width: 1180px;
-          margin: 0 auto;
-        }
-        .eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--gold);
-          font-weight: 500;
-          margin-bottom: 1.25rem;
-        }
-        .eyebrow::before {
-          content: '';
-          width: 28px;
-          height: 1px;
-          background: var(--gold);
-        }
-        .section-title {
+        .res-hero h1 {
           font-family: var(--font-display);
-          font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-          font-weight: 600;
-          line-height: 1.15;
-          color: var(--fg);
+          font-weight: 300;
+          font-size: clamp(2.8rem, 5.4vw, 5.2rem);
+          line-height: 1.02;
+          margin: 1.5rem 0;
+          color: var(--pearl);
+          letter-spacing: -0.015em;
         }
-        .section-title em {
+        .res-hero h1 em {
           font-style: italic;
-          color: var(--gold);
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .res-hero p {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.95rem;
+          color: var(--taupe);
+          line-height: 1.9;
+          max-width: 52ch;
+          margin: 0 auto 2rem;
         }
 
-        .reviews-stage {
+        .res-score {
+          display: inline-flex;
+          align-items: center;
+          gap: 1.5rem;
+          padding: 1.25rem 2rem;
+          border: 1px solid var(--border-soft);
+          background: rgba(201, 169, 110, 0.03);
+          backdrop-filter: blur(8px);
+        }
+        .res-score-num {
+          font-family: var(--font-display);
+          font-size: 3rem;
+          font-weight: 300;
+          color: var(--champagne);
+          line-height: 1;
+          letter-spacing: -0.01em;
+        }
+        .res-score-num sup {
+          font-size: 0.85rem;
+          color: var(--stone);
+          vertical-align: super;
+          margin-left: 0.2rem;
+        }
+        .res-score-meta {
+          text-align: left;
+          border-left: 1px solid var(--border-hair);
+          padding-left: 1.5rem;
+        }
+        .res-score-stars {
+          color: var(--champagne);
+          font-size: 0.9rem;
+          letter-spacing: 0.15em;
+          margin-bottom: 0.3rem;
+        }
+        .res-score-label {
+          font-family: var(--font-sans);
+          font-size: 0.58rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: var(--stone);
+        }
+
+        /* ── Carousel ── */
+        .res-carousel {
           position: relative;
+          padding: clamp(3rem, 5vw, 5rem) 0;
+          background: var(--obsidian);
           overflow: hidden;
-          margin: 3.5rem 0 4rem;
           -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
           mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
         }
-        .reviews-track {
+        .res-track {
           display: flex;
-          gap: 1.5rem;
+          gap: 2rem;
           width: max-content;
-          animation: scrollReviews 38s linear infinite;
+          padding: 2rem 0;
+          animation: slideTrack 64s linear infinite;
         }
-        .reviews-stage:hover .reviews-track {
+        .res-carousel:hover .res-track {
           animation-play-state: paused;
         }
-        @keyframes scrollReviews {
+        @keyframes slideTrack {
           0% {
             transform: translateX(0);
           }
@@ -172,290 +227,371 @@ export default function ReseniasPage() {
             transform: translateX(-50%);
           }
         }
-        .review-card {
-          width: 320px;
+        .res-card {
+          width: 380px;
           flex-shrink: 0;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          padding: 2rem 1.75rem 1.5rem;
+          background: linear-gradient(180deg, rgba(21, 17, 10, 0.9) 0%, rgba(12, 9, 5, 0.9) 100%);
+          border: 1px solid var(--border-hair);
+          padding: 2.5rem 2.25rem 2rem;
           position: relative;
-          overflow: hidden;
-          transition: border-color 0.3s;
-        }
-        .review-card:hover {
-          border-color: rgba(210, 185, 140, 0.16);
-        }
-        .review-quote {
-          font-family: var(--font-display);
-          font-size: 4.5rem;
-          color: var(--gold);
-          opacity: 0.12;
-          line-height: 0.8;
-          margin-bottom: 0.75rem;
-          display: block;
-        }
-        .review-text {
-          font-size: 0.83rem;
-          color: var(--fg2);
-          line-height: 1.85;
-          font-style: italic;
-          margin-bottom: 1.5rem;
-          min-height: 80px;
-        }
-        .review-footer {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-        .review-avatar {
-          width: 2.2rem;
-          height: 2.2rem;
-          border-radius: 50%;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: var(--font-display);
-          font-weight: 700;
-          font-size: 0.85rem;
-        }
-        .review-name {
-          font-family: var(--font-display);
-          font-weight: 600;
-          font-size: 0.82rem;
-          color: var(--fg);
-        }
-        .review-stars {
-          font-size: 0.72rem;
-          color: var(--gold);
-          letter-spacing: 1px;
-          margin-top: 0.15rem;
-        }
-        .reviews-pause-hint {
-          text-align: center;
-          margin-top: 1.25rem;
-          font-size: 0.7rem;
-          color: var(--fg3);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        .reviews-stage:hover .reviews-pause-hint {
-          opacity: 1;
-        }
-
-        .review-form-wrap {
-          display: grid;
-          grid-template-columns: 1fr 2fr;
-          gap: 3rem;
-          align-items: start;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          padding: 2.5rem;
-        }
-        .review-form-title {
-          font-family: var(--font-display);
-          font-size: 1.6rem;
-          font-weight: 600;
-          color: var(--fg);
-          line-height: 1.2;
-          margin-top: 0.5rem;
-        }
-        .review-form-title em {
-          color: var(--gold);
-          font-style: italic;
-        }
-        .rform-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-        }
-        .rform-group {
+          transition: border-color 0.6s var(--ease-silk), transform 0.6s var(--ease-silk);
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
+          min-height: 280px;
+        }
+        .res-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 60px;
+          height: 1px;
+          background: var(--champagne);
+        }
+        .res-card:hover {
+          border-color: var(--border-soft);
+          transform: translateY(-4px);
+        }
+        .res-card-quote {
+          font-family: var(--font-italiana);
+          font-size: 3rem;
+          color: var(--champagne);
+          opacity: 0.35;
+          line-height: 0.5;
           margin-bottom: 1rem;
         }
-        .rform-group label {
-          font-size: 0.68rem;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--fg3);
-          font-family: var(--font-display);
+        .res-card-text {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.9rem;
+          color: var(--ivory);
+          line-height: 1.85;
+          margin-bottom: 1.75rem;
+          flex: 1;
         }
-        .rform-group input,
-        .rform-group textarea {
-          background: var(--bg3);
-          border: 1px solid rgba(210, 185, 140, 0.16);
-          color: var(--fg);
-          padding: 0.7rem 0.9rem;
-          font-family: var(--font-body);
-          font-size: 0.83rem;
+        .res-card-footer {
+          padding-top: 1.2rem;
+          border-top: 1px solid var(--border-hair);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+        .res-card-author h4 {
+          font-family: var(--font-display);
+          font-weight: 500;
+          font-size: 1rem;
+          color: var(--pearl);
+          letter-spacing: 0;
+          margin-bottom: 0.15rem;
+        }
+        .res-card-author span {
+          font-family: var(--font-sans);
+          font-size: 0.56rem;
+          letter-spacing: 0.26em;
+          text-transform: uppercase;
+          color: var(--stone);
+        }
+        .res-card-right {
+          text-align: right;
+        }
+        .res-card-stars {
+          color: var(--champagne);
+          font-size: 0.8rem;
+          letter-spacing: 0.1em;
+          margin-bottom: 0.3rem;
+        }
+        .res-card-date {
+          font-family: var(--font-sans);
+          font-size: 0.54rem;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          color: var(--stone);
+        }
+
+        .res-pause {
+          text-align: center;
+          font-family: var(--font-sans);
+          font-size: 0.6rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: var(--stone);
+          margin-top: 2rem;
+          opacity: 0.6;
+        }
+
+        /* ── Form ── */
+        .res-form-section {
+          padding: clamp(5rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem);
+          background: linear-gradient(180deg, var(--obsidian) 0%, var(--onyx) 100%);
+          border-top: 1px solid var(--border-hair);
+        }
+        .res-form-inner {
+          max-width: 1180px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1fr 1.5fr;
+          gap: clamp(3rem, 6vw, 6rem);
+          align-items: start;
+        }
+        .res-form-head h2 {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(2rem, 3.6vw, 3.2rem);
+          line-height: 1.1;
+          color: var(--pearl);
+          margin: 1.5rem 0 1.5rem;
+        }
+        .res-form-head h2 em {
+          font-style: italic;
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .res-form-head p {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.9rem;
+          color: var(--taupe);
+          line-height: 1.85;
+          max-width: 34ch;
+        }
+
+        .res-form {
+          background: rgba(12, 9, 5, 0.6);
+          border: 1px solid var(--border-hair);
+          padding: 2.5rem;
+        }
+        .res-form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+        }
+        .res-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem;
+          margin-bottom: 1.5rem;
+          position: relative;
+        }
+        .res-field label {
+          font-family: var(--font-sans);
+          font-size: 0.56rem;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .res-field input,
+        .res-field textarea {
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid var(--border-soft);
+          color: var(--pearl);
+          padding: 0.7rem 0 0.9rem;
+          font-family: var(--font-serif);
+          font-size: 0.95rem;
           outline: none;
           resize: none;
-          transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+          transition: border-color 0.4s var(--ease-silk);
+          font-style: italic;
         }
-        .rform-group input:focus,
-        .rform-group textarea:focus {
-          border-color: var(--gold);
-          box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.12);
-          background: rgba(19, 16, 9, 0.96);
+        .res-field input:focus,
+        .res-field textarea:focus {
+          border-bottom-color: var(--champagne);
         }
-        .rform-group input::placeholder,
-        .rform-group textarea::placeholder {
-          color: var(--fg3);
+        .res-field input::placeholder,
+        .res-field textarea::placeholder {
+          color: var(--stone);
+          font-style: italic;
         }
-        .rstar-picker {
+        .res-field textarea {
+          min-height: 90px;
+        }
+
+        .res-stars-picker {
           display: flex;
-          gap: 0.2rem;
-          padding: 0.5rem 0;
-        }
-        .rstar-picker span {
-          font-size: 1.6rem;
-          color: var(--fg3);
-          cursor: pointer;
-          transition: color 0.12s, transform 0.12s;
-          user-select: none;
-        }
-        .rstar-picker span:hover,
-        .rstar-picker span.lit {
-          color: var(--gold);
-          transform: scale(1.15);
-        }
-        .rsubmit-btn {
-          display: inline-flex;
-          align-items: center;
           gap: 0.6rem;
-          background: var(--gold);
-          color: var(--bg3);
-          border: none;
-          padding: 0.75rem 1.75rem;
-          font-family: var(--font-display);
-          font-size: 0.75rem;
-          font-weight: 700;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          transition: background 0.2s, transform 0.2s;
+          padding: 0.3rem 0 0.5rem;
+          align-items: center;
+        }
+        .res-stars-picker button {
+          font-size: 1.6rem;
+          color: var(--shadow);
           cursor: pointer;
+          transition: color 0.3s, transform 0.3s var(--ease-silk);
+          padding: 0;
+          background: none;
+          border: none;
+          line-height: 1;
         }
-        .rsubmit-btn:hover {
-          background: var(--gold2);
-          transform: translateY(-2px);
+        .res-stars-picker button.lit {
+          color: var(--champagne);
         }
-        .rform-msg {
-          margin-top: 0.9rem;
-          padding: 0.65rem 1rem;
-          font-size: 0.8rem;
-          border-left: 2px solid var(--gold);
-          background: var(--gold-dim);
-          color: var(--fg2);
-          font-family: var(--font-body);
-        }
-        .rform-msg.error {
-          border-color: var(--red2);
-          background: var(--red-dim);
+        .res-stars-picker button:hover {
+          transform: scale(1.15) translateY(-2px);
         }
 
-        .reveal {
-          opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
-        }
-        .reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
+        .res-submit {
+          margin-top: 1rem;
         }
 
-        @media (max-width: 768px) {
-          .section {
-            padding: 5rem 1.25rem;
-          }
-          .review-form-wrap {
+        .res-msg {
+          margin-top: 1.5rem;
+          padding: 1rem 1.3rem;
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.85rem;
+          border-left: 2px solid var(--champagne);
+          background: rgba(201, 169, 110, 0.05);
+          color: var(--ivory);
+        }
+        .res-msg.error {
+          border-color: #c65a3c;
+          background: rgba(180, 92, 50, 0.08);
+        }
+
+        @media (max-width: 900px) {
+          .res-form-inner {
             grid-template-columns: 1fr;
-            gap: 1.5rem;
-            padding: 1.5rem;
+            gap: 3rem;
           }
-          .rform-row {
+          .res-form-row {
             grid-template-columns: 1fr;
+            gap: 0;
           }
-          .review-card {
-            width: 280px;
+          .res-card {
+            width: 300px;
+          }
+          .res-form {
+            padding: 1.75rem;
           }
         }
       `}</style>
 
-      <section className="section section-surface">
-        <div className="container">
-          <div className="eyebrow reveal">Nuestra comunidad</div>
-          <h1 className="section-title reveal" style={{ marginBottom: '2rem' }}>
-            Lo que dicen <em>nuestros clientes</em>
-          </h1>
-        </div>
-        <div className="reviews-stage">
-          <div className="reviews-track">
-            {duplicatedReviews.map((review, i) => (
-              <div className="review-card" key={`${review.name}-${i}`}>
-                <div className="review-quote">&#8220;</div>
-                <p className="review-text">{review.text}</p>
-                <div className="review-footer">
-                  <div className="review-avatar" style={Object.fromEntries(review.avatarStyle.split(';').filter(Boolean).map((c) => { const [k, v] = c.split(':'); return [k.trim().replace(/-([a-z])/g, (_, x) => x.toUpperCase()), v.trim()]; }))}>
-                    {review.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="review-name">{review.name}</div>
-                    <div className="review-stars">{starsText(review.stars)}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <section className="res-hero">
+        <div className="eyebrow center reveal">La voz de los huéspedes</div>
+        <h1 className="reveal reveal-delay-1">
+          Lo que dicen
+          <br />
+          <em>de nosotros</em>
+        </h1>
+        <p className="reveal reveal-delay-2">
+          Cada reseña es una conversación silenciosa entre el comensal y nuestro equipo.
+          Las leemos todas. Nos ayudan a ser mejores cada día.
+        </p>
+        <div className="res-score reveal reveal-delay-3">
+          <div className="res-score-num">
+            {avgStars.toFixed(1)}
+            <sup>/ 5</sup>
           </div>
-          <div className="reviews-pause-hint">Pausa</div>
-        </div>
-        <div className="container">
-          <div className="review-form-wrap reveal">
-            <div>
-              <div className="eyebrow" style={{ marginBottom: '0.5rem' }}>
-                Comparte tu experiencia
-              </div>
-              <h2 className="review-form-title">
-                Deja tu <em>reseña</em>
-              </h2>
+          <div className="res-score-meta">
+            <div className="res-score-stars">{stars(Math.round(avgStars))}</div>
+            <div className="res-score-label">
+              Basado en {reviews.length}+ reseñas
             </div>
-            <div>
-              <div className="rform-row">
-                <div className="rform-group">
-                  <label>Tu nombre</label>
-                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Juan López" />
+          </div>
+        </div>
+      </section>
+
+      <section className="res-carousel">
+        <div className="res-track">
+          {duplicatedReviews.map((review, i) => (
+            <article className="res-card" key={`${review.name}-${i}`}>
+              <div className="res-card-quote">&ldquo;</div>
+              <p className="res-card-text">{review.text}</p>
+              <div className="res-card-footer">
+                <div className="res-card-author">
+                  <h4>{review.name}</h4>
+                  <span>— {review.city}</span>
                 </div>
-                <div className="rform-group">
-                  <label>Calificación</label>
-                  <div className="rstar-picker">
-                    {[1, 2, 3, 4, 5].map((v) => (
-                      <span key={v} className={v <= rating ? 'lit' : ''} onClick={() => setRating(v)}>
-                        ★
-                      </span>
-                    ))}
-                  </div>
+                <div className="res-card-right">
+                  <div className="res-card-stars">{stars(review.stars)}</div>
+                  <div className="res-card-date">{review.date}</div>
                 </div>
               </div>
-              <div className="rform-group">
-                <label>Tu reseña</label>
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  rows={3}
-                  placeholder="¿Qué fue lo que más te gustó de Ébenezer?"
+            </article>
+          ))}
+        </div>
+        <div className="res-pause">— Pasa el cursor para pausar —</div>
+      </section>
+
+      <section className="res-form-section">
+        <div className="res-form-inner">
+          <div className="res-form-head">
+            <div className="eyebrow reveal">Deja tu huella</div>
+            <h2 className="reveal reveal-delay-1">
+              Comparte tu
+              <br />
+              <em>experiencia</em>
+            </h2>
+            <p className="reveal reveal-delay-2">
+              Tu opinión es el combustible silencioso que nos empuja a mejorar. Gracias por
+              tomarte unos minutos para contarnos tu visita.
+            </p>
+          </div>
+
+          <div className="res-form reveal reveal-delay-2">
+            <div className="res-form-row">
+              <div className="res-field">
+                <label>Tu nombre</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nombre completo"
+                  autoComplete="name"
                 />
               </div>
-              <button className="rsubmit-btn" onClick={submitReview}>
-                Publicar reseña
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 13, height: 13 }}>
-                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+              <div className="res-field">
+                <label>Ciudad</label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Opcional"
+                />
+              </div>
+            </div>
+
+            <div className="res-field">
+              <label>Tu calificación</label>
+              <div className="res-stars-picker" role="radiogroup" aria-label="Calificación">
+                {[1, 2, 3, 4, 5].map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={v <= (hoverRating || rating) ? 'lit' : ''}
+                    onClick={() => setRating(v)}
+                    onMouseEnter={() => setHoverRating(v)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    aria-label={`${v} estrellas`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="res-field">
+              <label>Tu experiencia</label>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                rows={4}
+                placeholder="¿Qué te llevaste de Ébenezer?"
+              />
+            </div>
+
+            <div className="res-submit">
+              <button className="lux-btn" onClick={submitReview} disabled={loading}>
+                <span>{loading ? 'Enviando...' : 'Publicar reseña'}</span>
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
-              {message && <div className={`rform-msg${messageError ? ' error' : ''}`}>{message}</div>}
             </div>
+
+            {message && <div className={`res-msg${messageError ? ' error' : ''}`}>{message}</div>}
           </div>
         </div>
       </section>

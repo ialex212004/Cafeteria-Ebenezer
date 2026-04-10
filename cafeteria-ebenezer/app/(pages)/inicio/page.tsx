@@ -1,11 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import SplashScreen from '../../components/SplashScreen';
 
 export default function InicioPage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [hoveredPanel, setHoveredPanel] = useState<'day' | 'night' | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,16 +23,14 @@ export default function InicioPage() {
       H = 0,
       af = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    const palette = ['rgba(212,168,83,', 'rgba(168,50,40,', 'rgba(242,236,224,'];
-    const particleCount = window.innerWidth < 768 ? 28 : 45;
+    const particleCount = window.innerWidth < 768 ? 24 : 42;
     const pts = Array.from({ length: particleCount }, () => ({
       x: Math.random() * 1920,
       y: Math.random() * 1080,
-      r: Math.random() * 1.4 + 0.3,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: -Math.random() * 0.22 - 0.05,
-      a: Math.random() * 0.45 + 0.1,
-      c: palette[Math.floor(Math.random() * palette.length)],
+      r: Math.random() * 1.2 + 0.2,
+      vx: (Math.random() - 0.5) * 0.12,
+      vy: -Math.random() * 0.18 - 0.03,
+      a: Math.random() * 0.4 + 0.08,
     }));
 
     const resize = () => {
@@ -54,7 +54,7 @@ export default function InicioPage() {
         if (p.x > W + 5) p.x = -5;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `${p.c}${p.a})`;
+        ctx.fillStyle = `rgba(201, 169, 110, ${p.a})`;
         ctx.fill();
       });
       af = requestAnimationFrame(draw);
@@ -69,221 +69,258 @@ export default function InicioPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <SplashScreen />
       <style jsx global>{`
-        * {
-          margin: 0;
-          padding: 0;
-        }
-        :root {
-          --bg: #0e0b08;
-          --bg2: #131009;
-          --bg3: #18140d;
-          --surface: #201a11;
-          --border: rgba(210, 185, 140, 0.08);
-          --border2: rgba(210, 185, 140, 0.16);
-          --fg: #f2ece0;
-          --fg2: #a89880;
-          --fg3: #5c5040;
-          --gold: #d4a853;
-          --gold2: #edc97a;
-          --gold-dim: rgba(212, 168, 83, 0.12);
-          --red: #a83228;
-          --red2: #d4503f;
-          --red-dim: rgba(168, 50, 40, 0.14);
-          --font-display: 'Poppins', sans-serif;
-          --font-body: 'Libre Baskerville', Georgia, serif;
-          --ease: cubic-bezier(0.34, 1.56, 0.64, 1);
-          --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        body {
-          font-family: var(--font-body);
-          background: var(--bg);
-          color: var(--fg);
-          overflow-x: hidden;
-          font-size: 0.9rem;
-          line-height: 1.8;
-        }
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-          font-family: var(--font-display);
-          letter-spacing: -0.01em;
-        }
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-        button {
-          font: inherit;
-          cursor: pointer;
-        }
-
         /* ── HERO ── */
-        #inicio {
-          height: 100vh;
-          min-height: 600px;
+        #hero {
+          position: relative;
+          height: calc(100vh - var(--stack));
+          min-height: 640px;
           display: flex;
           overflow: hidden;
-          margin-top: 70px;
+          margin-top: var(--stack);
+        }
+        .hero-bg-canvas {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          mix-blend-mode: screen;
+          opacity: 0.35;
         }
         .hero-panel {
           position: relative;
           flex: 1;
           display: flex;
-          align-items: flex-end;
+          align-items: center;
           overflow: hidden;
-          transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: flex 1.1s cubic-bezier(0.16, 1, 0.3, 1);
           min-width: 0;
           cursor: pointer;
         }
-        .hero-panel:hover {
-          flex: 1.25;
+        .hero-panel.expanded {
+          flex: 1.55;
+        }
+        .hero-panel.shrunk {
+          flex: 0.85;
         }
         .hero-panel img {
-          position: absolute;
+          position: absolute !important;
           inset: 0;
-          width: 100%;
-          height: 100%;
+          width: 100% !important;
+          height: 100% !important;
           object-fit: cover;
-          transition: transform 0.8s var(--ease-smooth), filter 0.8s var(--ease-smooth);
-          filter: brightness(0.45) saturate(0.8);
-          will-change: transform;
+          transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s var(--ease-silk);
+          filter: brightness(0.42) saturate(0.72) contrast(1.04);
+          transform: scale(1.05);
         }
-        .hero-panel:hover img {
-          transform: scale(1.06);
-          filter: brightness(0.5) saturate(0.9);
+        .hero-panel.expanded img {
+          transform: scale(1.09);
+          filter: brightness(0.55) saturate(0.88) contrast(1.02);
         }
         .hero-grad {
           position: absolute;
           inset: 0;
+          z-index: 2;
         }
-        .hero-panel-day .hero-grad {
-          background: linear-gradient(to top, rgba(14, 11, 8, 0.97) 0%, rgba(14, 11, 8, 0.5) 40%, rgba(14, 11, 8, 0.1) 100%),
-            linear-gradient(to right, rgba(14, 11, 8, 0.6) 0%, transparent 55%),
-            radial-gradient(ellipse 60% 40% at 30% 80%, rgba(212, 168, 83, 0.08) 0%, transparent 70%);
+        .hero-panel--day .hero-grad {
+          background:
+            linear-gradient(180deg, rgba(8, 6, 3, 0.1) 0%, rgba(8, 6, 3, 0.4) 50%, rgba(8, 6, 3, 0.95) 100%),
+            linear-gradient(to right, rgba(8, 6, 3, 0.65) 0%, transparent 45%),
+            radial-gradient(ellipse 70% 50% at 25% 75%, rgba(201, 169, 110, 0.12) 0%, transparent 70%);
         }
-        .hero-panel-night .hero-grad {
-          background: linear-gradient(to top, rgba(14, 11, 8, 0.97) 0%, rgba(14, 11, 8, 0.5) 40%, rgba(14, 11, 8, 0.1) 100%),
-            linear-gradient(to left, rgba(14, 11, 8, 0.6) 0%, transparent 55%),
-            radial-gradient(ellipse 60% 40% at 70% 80%, rgba(168, 50, 40, 0.1) 0%, transparent 70%);
+        .hero-panel--night .hero-grad {
+          background:
+            linear-gradient(180deg, rgba(8, 6, 3, 0.1) 0%, rgba(8, 6, 3, 0.4) 50%, rgba(8, 6, 3, 0.95) 100%),
+            linear-gradient(to left, rgba(8, 6, 3, 0.65) 0%, transparent 45%),
+            radial-gradient(ellipse 70% 50% at 75% 75%, rgba(180, 92, 50, 0.14) 0%, transparent 70%);
         }
         .hero-divider {
           position: absolute;
-          top: 0;
-          bottom: 0;
+          top: 15%;
+          bottom: 15%;
           right: 0;
           width: 1px;
-          background: linear-gradient(to bottom, transparent 0%, var(--border2) 30%, var(--border2) 70%, transparent 100%);
+          background: linear-gradient(to bottom, transparent 0%, rgba(201, 169, 110, 0.35) 50%, transparent 100%);
           z-index: 5;
+          pointer-events: none;
+        }
+        .hero-divider::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--champagne);
+          transform: translate(-50%, -50%) rotate(45deg);
+          box-shadow: 0 0 24px rgba(201, 169, 110, 0.6);
         }
         .hero-content {
           position: relative;
           z-index: 10;
-          padding: 5rem 7rem;
+          padding: 3rem clamp(3rem, 7vw, 7rem) 4rem;
           width: 100%;
+          max-width: 48rem;
+        }
+        .hero-index {
+          font-family: var(--font-sans);
+          font-size: 0.64rem;
+          letter-spacing: 0.42em;
+          text-transform: uppercase;
+          color: var(--stone);
+          margin-bottom: 2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          opacity: 0;
+          animation: heroUp 1.4s 0.4s both var(--ease-silk);
+        }
+        .hero-index b {
+          color: var(--champagne);
+          font-weight: 400;
+        }
+        .hero-index::before {
+          content: '';
+          width: 42px;
+          height: 1px;
+          background: var(--champagne);
         }
         .hero-tag {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.18em;
+          display: inline-block;
+          font-family: var(--font-sans);
+          font-size: 0.62rem;
+          letter-spacing: 0.34em;
           text-transform: uppercase;
-          color: var(--gold);
-          font-weight: 500;
-          margin-bottom: 1.2rem;
+          color: var(--champagne);
+          margin-bottom: 1.5rem;
           opacity: 0;
-          animation: fadeUp 0.8s 0.3s both;
-        }
-        .hero-tag::before {
-          content: '';
-          width: 24px;
-          height: 1px;
-          background: var(--gold);
-        }
-        .hero-night .hero-tag {
-          color: var(--red2);
-        }
-        .hero-night .hero-tag::before {
-          background: var(--red2);
+          animation: heroUp 1.4s 0.55s both var(--ease-silk);
         }
         .hero-title {
           font-family: var(--font-display);
-          font-size: clamp(2rem, 4vw, 3.2rem);
-          font-weight: 600;
-          line-height: 1.1;
-          color: var(--fg);
-          margin-bottom: 1rem;
+          font-weight: 300;
+          font-size: clamp(2.8rem, 5.6vw, 5.8rem);
+          line-height: 0.98;
+          letter-spacing: -0.015em;
+          color: var(--pearl);
+          margin-bottom: 1.75rem;
           opacity: 0;
-          animation: fadeUp 0.8s 0.45s both;
+          animation: heroUp 1.6s 0.7s both var(--ease-silk);
         }
         .hero-title em {
           font-style: italic;
-          color: var(--gold);
-        }
-        .hero-night .hero-title em {
-          color: var(--red2);
+          font-weight: 400;
+          color: var(--champagne);
+          display: inline-block;
         }
         .hero-sub {
-          font-size: 0.85rem;
-          color: var(--fg2);
-          line-height: 1.8;
-          max-width: 34ch;
-          margin-bottom: 2rem;
-          font-family: var(--font-body);
-          font-weight: 300;
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 0.95rem;
+          line-height: 1.85;
+          color: var(--taupe);
+          max-width: 36ch;
+          margin-bottom: 2.5rem;
           opacity: 0;
-          animation: fadeUp 0.8s 0.6s both;
+          animation: heroUp 1.4s 0.85s both var(--ease-silk);
         }
-        .hero-btn {
+        .hero-cta {
           display: inline-flex;
           align-items: center;
-          gap: 0.6rem;
-          font-size: 0.75rem;
-          letter-spacing: 0.12em;
+          gap: 0.9rem;
+          font-family: var(--font-sans);
+          font-size: 0.64rem;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          font-weight: 500;
-          font-family: var(--font-body);
-          padding: 0.75rem 1.6rem;
-          border: 1px solid;
-          transition: all 0.3s;
+          color: var(--pearl);
+          padding: 1.05rem 0;
+          position: relative;
+          transition: color 0.55s var(--ease-silk), letter-spacing 0.55s var(--ease-silk);
           opacity: 0;
-          animation: fadeUp 0.8s 0.75s both;
+          animation: heroUp 1.4s 1s both var(--ease-silk);
         }
-        .hero-btn-day {
-          border-color: var(--gold);
-          color: var(--gold);
+        .hero-cta::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 1px;
+          background: var(--champagne);
         }
-        .hero-btn-day:hover {
-          background: var(--gold);
-          color: var(--bg);
+        .hero-cta::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 12px;
+          height: 1px;
+          background: var(--pearl);
+          transition: width 0.55s var(--ease-silk), background 0.4s;
         }
-        .hero-btn-night {
-          border-color: var(--red2);
-          color: var(--red2);
+        .hero-cta:hover {
+          color: var(--champagne);
+          letter-spacing: 0.32em;
         }
-        .hero-btn-night:hover {
-          background: var(--red2);
-          color: var(--fg);
+        .hero-cta:hover::after {
+          width: 100%;
+          background: var(--champagne);
         }
-        .hero-btn svg {
+        .hero-cta svg {
           width: 14px;
           height: 14px;
-          transition: transform 0.3s;
+          transition: transform 0.55s var(--ease-silk);
         }
-        .hero-btn:hover svg {
-          transform: translateX(4px);
+        .hero-cta:hover svg {
+          transform: translateX(6px);
         }
-        @keyframes fadeUp {
+
+        .hero-meta {
+          position: absolute;
+          bottom: 2rem;
+          left: clamp(3rem, 7vw, 7rem);
+          right: clamp(3rem, 7vw, 7rem);
+          z-index: 11;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-family: var(--font-sans);
+          font-size: 0.58rem;
+          letter-spacing: 0.26em;
+          text-transform: uppercase;
+          color: var(--stone);
+          opacity: 0;
+          animation: heroUp 1.4s 1.2s both var(--ease-silk);
+          pointer-events: none;
+        }
+        .hero-meta b {
+          color: var(--champagne);
+          font-weight: 400;
+        }
+
+        @keyframes heroUp {
           from {
             opacity: 0;
-            transform: translateY(24px);
+            transform: translateY(34px);
           }
           to {
             opacity: 1;
@@ -291,91 +328,374 @@ export default function InicioPage() {
           }
         }
 
-        /* ── PARTICLES & AMBIENT ── */
-        #particles {
-          mix-blend-mode: screen;
+        /* ── PHILOSOPHY ── */
+        .philosophy {
+          position: relative;
+          padding: clamp(8rem, 14vw, 14rem) clamp(1.5rem, 5vw, 5rem);
+          text-align: center;
+          background: var(--obsidian);
+          overflow: hidden;
         }
-        body::before {
+        .philosophy::before {
           content: '';
-          position: fixed;
+          position: absolute;
           inset: 0;
-          z-index: 0;
+          background:
+            radial-gradient(ellipse 60% 40% at 50% 50%, rgba(201, 169, 110, 0.06) 0%, transparent 70%);
           pointer-events: none;
-          background: radial-gradient(ellipse 40% 30% at 15% 50%, rgba(212, 168, 83, 0.04) 0%, transparent 100%),
-            radial-gradient(ellipse 35% 25% at 85% 30%, rgba(168, 50, 40, 0.05) 0%, transparent 100%),
-            radial-gradient(ellipse 50% 40% at 50% 90%, rgba(212, 168, 83, 0.03) 0%, transparent 100%);
+        }
+        .philosophy-inner {
+          position: relative;
+          max-width: 920px;
+          margin: 0 auto;
+        }
+        .philosophy-mark {
+          font-family: var(--font-italiana);
+          font-size: 1.1rem;
+          color: var(--champagne);
+          letter-spacing: 0.3em;
+          margin-bottom: 2rem;
+          text-transform: uppercase;
+        }
+        .philosophy-quote {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-style: italic;
+          font-size: clamp(1.8rem, 3.8vw, 3.2rem);
+          line-height: 1.35;
+          color: var(--pearl);
+          letter-spacing: -0.005em;
+        }
+        .philosophy-quote em {
+          font-weight: 400;
+          color: var(--champagne);
+          font-style: italic;
+        }
+        .philosophy-signature {
+          margin-top: 3rem;
+          font-family: var(--font-italiana);
+          font-size: 1.4rem;
+          color: var(--taupe);
+          letter-spacing: 0.08em;
+        }
+        .philosophy-role {
+          margin-top: 0.6rem;
+          font-family: var(--font-sans);
+          font-size: 0.58rem;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--stone);
         }
 
-        @media (max-width: 768px) {
-          #inicio {
+        /* ── PILLARS ── */
+        .pillars {
+          position: relative;
+          padding: clamp(6rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem);
+          background: linear-gradient(180deg, var(--obsidian) 0%, var(--onyx) 100%);
+          border-top: 1px solid var(--border-hair);
+          border-bottom: 1px solid var(--border-hair);
+        }
+        .pillars-inner {
+          max-width: 1240px;
+          margin: 0 auto;
+        }
+        .pillars-header {
+          text-align: center;
+          margin-bottom: 5rem;
+        }
+        .pillars-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0;
+          border-top: 1px solid var(--border-hair);
+        }
+        .pillar {
+          position: relative;
+          padding: 3rem 2.5rem 0.5rem;
+          border-right: 1px solid var(--border-hair);
+          text-align: center;
+          transition: background 0.6s var(--ease-silk);
+        }
+        .pillar:last-child {
+          border-right: none;
+        }
+        .pillar:hover {
+          background: rgba(201, 169, 110, 0.02);
+        }
+        .pillar-num {
+          font-family: var(--font-italiana);
+          font-size: 2.8rem;
+          color: var(--champagne);
+          line-height: 1;
+          margin-bottom: 1.5rem;
+          opacity: 0.8;
+        }
+        .pillar-title {
+          font-family: var(--font-display);
+          font-weight: 400;
+          font-size: 1.4rem;
+          color: var(--pearl);
+          margin-bottom: 1rem;
+          letter-spacing: 0.01em;
+        }
+        .pillar-title em {
+          font-style: italic;
+          color: var(--champagne);
+        }
+        .pillar-text {
+          font-family: var(--font-serif);
+          font-size: 0.85rem;
+          color: var(--taupe);
+          line-height: 1.85;
+          max-width: 28ch;
+          margin: 0 auto;
+        }
+
+        /* ── INVITATION ── */
+        .invitation {
+          position: relative;
+          padding: clamp(7rem, 12vw, 12rem) clamp(1.5rem, 5vw, 5rem);
+          text-align: center;
+          background:
+            linear-gradient(180deg, rgba(8, 6, 3, 0.72) 0%, rgba(8, 6, 3, 0.9) 100%),
+            url('https://images.unsplash.com/photo-1559925393-8be0ec4767c8?auto=format&fit=crop&w=1800&q=80') center/cover;
+          background-attachment: fixed;
+        }
+        .invitation-inner {
+          position: relative;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+        .invitation-title {
+          font-family: var(--font-display);
+          font-weight: 300;
+          font-size: clamp(2.4rem, 5vw, 4.4rem);
+          line-height: 1.05;
+          color: var(--pearl);
+          margin-bottom: 2rem;
+        }
+        .invitation-title em {
+          font-style: italic;
+          font-weight: 400;
+          color: var(--champagne);
+        }
+        .invitation-sub {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 1rem;
+          color: var(--ivory);
+          line-height: 1.85;
+          margin-bottom: 2.8rem;
+          max-width: 48ch;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        @media (max-width: 900px) {
+          #hero {
             flex-direction: column;
             height: auto;
           }
           .hero-panel {
-            min-height: 55vh;
+            min-height: 62vh;
           }
           .hero-content {
-            padding: 2rem 1.5rem;
+            padding: 3rem 2rem 3.5rem;
           }
           .hero-divider {
             display: none;
           }
+          .hero-meta {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            right: auto;
+            padding: 1rem 2rem 2rem;
+          }
+          .pillars-grid {
+            grid-template-columns: 1fr;
+          }
+          .pillar {
+            border-right: none;
+            border-bottom: 1px solid var(--border-hair);
+            padding: 3rem 2rem;
+          }
+          .pillar:last-child {
+            border-bottom: none;
+          }
+          .invitation {
+            background-attachment: scroll;
+          }
         }
       `}</style>
 
-      <canvas ref={canvasRef} id="particles" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0, opacity: 0.3 }} />
+      <canvas ref={canvasRef} className="hero-bg-canvas" aria-hidden="true" />
 
-      <section id="inicio">
-        <div className="hero-panel hero-panel-day">
+      <section id="hero">
+        <div
+          className={`hero-panel hero-panel--day${
+            hoveredPanel === 'day' ? ' expanded' : hoveredPanel === 'night' ? ' shrunk' : ''
+          }`}
+          onMouseEnter={() => setHoveredPanel('day')}
+          onMouseLeave={() => setHoveredPanel(null)}
+        >
           <Image
-            src="https://www.pexels.com/es-es/foto/36892844/"
-            alt="Café artesanal"
+            src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1800&q=85"
+            alt="Espresso en taza de porcelana"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 900px) 100vw, 55vw"
           />
           <div className="hero-grad" />
           <div className="hero-divider" />
           <div className="hero-content">
-            <span className="hero-tag">Tus Mañanas en Cafeteria Ébenezer</span>
+            <p className="hero-index">
+              Cap. <b>I</b> — La mañana
+            </p>
+            <span className="hero-tag">— Café de especialidad</span>
             <h1 className="hero-title">
               El arte del
               <br />
-              <em>buen café</em>
+              <em>despertar</em>
             </h1>
-            <p className="hero-sub">Granos seleccionados, preparaciones artesanales. Cada taza cuenta una historia.</p>
-            <a href="/menu" className="hero-btn hero-btn-day">
-              Ver menú de café
+            <p className="hero-sub">
+              Granos de origen único, tostados a diario. Cada taza, una composición silenciosa
+              para comenzar el día con reverencia.
+            </p>
+            <Link href="/menu" className="hero-cta">
+              Descubrir la carta de café
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
+          </div>
+          <div className="hero-meta">
+            <span>08:00 — 16:00</span>
+            <span>
+              Servicio <b>Cafetería</b>
+            </span>
           </div>
         </div>
-        <div className="hero-panel hero-panel-night hero-night">
+
+        <div
+          className={`hero-panel hero-panel--night${
+            hoveredPanel === 'night' ? ' expanded' : hoveredPanel === 'day' ? ' shrunk' : ''
+          }`}
+          onMouseEnter={() => setHoveredPanel('night')}
+          onMouseLeave={() => setHoveredPanel(null)}
+        >
           <Image
-            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-            alt="Pizza artesanal"
+            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1800&q=85"
+            alt="Pizza artesanal en horno de leña"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 900px) 100vw, 55vw"
           />
           <div className="hero-grad" />
           <div className="hero-content">
-            <span className="hero-tag">Noches en Ébenezer</span>
+            <p className="hero-index">
+              Cap. <b>II</b> — La noche
+            </p>
+            <span className="hero-tag">— Pizzería artesana</span>
             <h2 className="hero-title">
               La noche
               <br />
-              <em>pide pizza</em>
+              <em>servida</em>
             </h2>
-            <p className="hero-sub">Ingredientes frescos, horno de piedra. Pizzas artesanales que hablan por sí solas.</p>
-            <a href="/menu" className="hero-btn hero-btn-night">
-              Ver menú de pizza
+            <p className="hero-sub">
+              Masa madre de 48 horas, horno de piedra a 480°C. Ingredientes que cuentan
+              la historia de la tierra que los vio nacer.
+            </p>
+            <Link href="/menu" className="hero-cta">
+              Explorar nuestras pizzas
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </div>
+          <div className="hero-meta">
+            <span>
+              Servicio <b>Pizzería</b>
+            </span>
+            <span>16:00 — 23:00</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="philosophy">
+        <div className="philosophy-inner">
+          <p className="philosophy-mark reveal">— Nuestra filosofía —</p>
+          <h2 className="philosophy-quote reveal reveal-delay-1">
+            &ldquo;No servimos café ni pizza. Servimos el tiempo que decides
+            dedicarte: cada grano, cada masa, cada minuto, <em>elegidos con devoción</em>.&rdquo;
+          </h2>
+          <div className="philosophy-signature reveal reveal-delay-2">Ébenezer</div>
+          <div className="philosophy-role reveal reveal-delay-2">Chef · Fundador</div>
+        </div>
+      </section>
+
+      <section className="pillars">
+        <div className="pillars-inner">
+          <div className="pillars-header">
+            <div className="eyebrow center reveal" style={{ marginBottom: '1.5rem' }}>
+              La casa
+            </div>
+            <h2 className="section-title reveal reveal-delay-1">
+              Tres pilares, <em>un solo oficio</em>
+            </h2>
+          </div>
+          <div className="pillars-grid">
+            <div className="pillar reveal reveal-delay-1">
+              <div className="pillar-num">I</div>
+              <h3 className="pillar-title">
+                <em>Materia</em> prima
+              </h3>
+              <p className="pillar-text">
+                Productores seleccionados, trazabilidad absoluta y temporada como única ley.
+              </p>
+            </div>
+            <div className="pillar reveal reveal-delay-2">
+              <div className="pillar-num">II</div>
+              <h3 className="pillar-title">
+                <em>Oficio</em> artesano
+              </h3>
+              <p className="pillar-text">
+                Técnicas pacientes, manos expertas y una obsesión silenciosa por el detalle.
+              </p>
+            </div>
+            <div className="pillar reveal reveal-delay-3">
+              <div className="pillar-num">III</div>
+              <h3 className="pillar-title">
+                <em>Hospitalidad</em>
+              </h3>
+              <p className="pillar-text">
+                Recibirte como a un amigo, cuidar cada minuto que nos regalas bajo nuestro techo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="invitation">
+        <div className="invitation-inner">
+          <div className="eyebrow center reveal" style={{ marginBottom: '2rem' }}>
+            Una mesa te espera
+          </div>
+          <h2 className="invitation-title reveal reveal-delay-1">
+            Concédenos el placer
+            <br />
+            de <em>recibirte</em>
+          </h2>
+          <p className="invitation-sub reveal reveal-delay-2">
+            La experiencia Ébenezer está pensada para saborearse sin prisa. Reserva tu mesa
+            y deja que nos ocupemos de todo lo demás.
+          </p>
+          <Link href="/contacto" className="lux-btn reveal reveal-delay-3">
+            <span>Reservar una mesa</span>
+            <svg viewBox="0 0 24 24">
+              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
         </div>
       </section>
     </>
