@@ -443,7 +443,7 @@ export default function InicioPage() {
           text-align: center;
           background:
             linear-gradient(180deg, rgba(8, 6, 3, 0.72) 0%, rgba(8, 6, 3, 0.9) 100%),
-            url('/images/inicio/interior-luces.jpg') center/cover;
+            url('https://images.unsplash.com/photo-1514432324607-2e467f4af498?auto=format&fit=crop&w=1800&q=80') center/cover;
           background-attachment: fixed;
         }
         .invitation-inner {
@@ -525,7 +525,7 @@ export default function InicioPage() {
           onMouseLeave={() => setHoveredPanel(null)}
         >
           <Image
-            src="/images/inicio/cafe.jpg"
+            src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1800&q=85"
             alt="Espresso en taza de porcelana"
             fill
             priority
@@ -570,7 +570,7 @@ export default function InicioPage() {
           onMouseLeave={() => setHoveredPanel(null)}
         >
           <Image
-            src="/images/inicio/pizza.jpg"
+            src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?auto=format&fit=crop&w=1800&q=85"
             alt="Pizza artesanal en horno de leña"
             fill
             priority
