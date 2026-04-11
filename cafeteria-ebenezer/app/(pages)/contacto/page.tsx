@@ -407,10 +407,6 @@ export default function ContactoPage() {
         }
       `}</style>
 
-      {submitted && (
-        <></>
-      )}
-
       <section className="contact-hero">
         <div className="eyebrow center reveal">Te esperamos</div>
         <h1 className="reveal reveal-delay-1">
