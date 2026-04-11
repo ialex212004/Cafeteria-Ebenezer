@@ -339,3 +339,18 @@ h6 {
     --info-h: 32px;
   }
 }
+
+/* ── SplashScreen: CSS crítico de posicionamiento ────────────────────────
+   Debe vivir aquí (critical CSS path / <head>) para que la pantalla
+   cubra el contenido desde el PRIMER paint, antes de que el bundle JS
+   hidrate el componente y aplique sus propios estilos.
+───────────────────────────────────────────────────────────────────────── */
+.spl {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: #080603;
+  overflow: hidden;
+}
