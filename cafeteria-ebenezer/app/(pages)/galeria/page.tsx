@@ -15,72 +15,72 @@ type GalleryImage = {
 const images: GalleryImage[] = [
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.19_s5put0.jpg',
-    alt: 'Tres tazas de café con latte art en Cafetería Ébenezer',
-    label: 'Latte art',
-    caption: 'Tres tazas, un ritual que se repite',
+    alt: 'Tres cafés con leche en Cafetería Ébenezer',
+    label: 'Café con leche',
+    caption: 'El más pedido. Cada mañana.',
     index: '01',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.21_1_l55l1b.jpg',
-    alt: 'Lámparas esféricas y barra de Cafetería Ébenezer',
-    label: 'El ambiente',
-    caption: 'Luz cálida, vigas de madera, hogar',
+    alt: 'Interior con lámparas y barra de Cafetería Ébenezer',
+    label: 'El local',
+    caption: 'Un sitio con carácter propio.',
     index: '02',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171741/WhatsApp_Image_2026-04-03_at_11.33.18_4_lwhzqp.jpg',
     alt: 'Bowl de frutas frescas con crema en Cafetería Ébenezer',
-    label: 'Frescura',
-    caption: 'Fresas, arándanos y mango sobre crema',
+    label: 'Fruta de temporada',
+    caption: 'Crema de la casa, fruta del día.',
     index: '03',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776174685/ChatGPT_Image_16_mar_2026_20_09_53_ru4nei.png',
-    alt: 'Tosta con aguacate, pollo y tomates cherry en Cafetería Ébenezer',
+    alt: 'Tosta con aguacate, pollo y tomate cherry en Cafetería Ébenezer',
     label: 'Tosta',
-    caption: 'Aguacate, pollo desmenuzado y tomate cherry',
+    caption: 'Aguacate, pollo y tomate cherry. Ligero y llena.',
     index: '04',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776174681/WhatsApp_Image_2026-04-03_at_11.33.20_2_gvblyx.jpg',
-    alt: 'Barra con máquina de espresso y suelo de mosaico en Cafetería Ébenezer',
+    alt: 'Barra con máquina de espresso en Cafetería Ébenezer',
     label: 'La barra',
-    caption: 'La máquina, el barista, el ritual',
+    caption: 'Aquí nace tu café.',
     index: '05',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776174682/WhatsApp_Image_2026-04-03_at_11.33.20_1_ftv8rw.jpg',
-    alt: 'Sala interior con columna y mosaico en Cafetería Ébenezer',
+    alt: 'Sala interior de Cafetería Ébenezer',
     label: 'El espacio',
-    caption: 'Cada rincón invita a quedarse',
+    caption: 'Entra a desayunar. Te quedas a comer.',
     index: '06',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.21_1_l55l1b.jpg',
-    alt: 'Esferas de luz sobre la barra en Cafetería Ébenezer',
-    label: 'Identidad',
-    caption: 'Esferas de luz que marcan el ritmo',
+    alt: 'Lámparas esféricas sobre la barra en Cafetería Ébenezer',
+    label: 'Ambiente',
+    caption: 'La luz que hace que el tiempo pase bien.',
     index: '07',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.19_s5put0.jpg',
-    alt: 'Arte en espuma de tres cafés en Cafetería Ébenezer',
+    alt: 'Tres cafés preparados en Cafetería Ébenezer',
     label: 'Café',
-    caption: 'Arte efímero en cada preparación',
+    caption: 'Tres pedidos distintos. La misma calidad.',
     index: '08',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171741/WhatsApp_Image_2026-03-12_at_12.45.13_2_rmvhfd.jpg',
-    alt: 'Brunch completo con tosta de aguacate y café con leche en Cafetería Ébenezer',
+    alt: 'Brunch completo con aguacate, granola y café en Cafetería Ébenezer',
     label: 'Brunch',
-    caption: 'Aguacate, semillas, frutas y café con leche',
+    caption: 'Aguacate, granola, fruta y café. Todo en un plato.',
     index: '09',
   },
   {
     src: 'https://res.cloudinary.com/dphq9ymvo/image/upload/v1776174688/ChatGPT_Image_16_mar_2026_22_39_26_vrhi49.png',
     alt: 'Pizza con pepperoni y jamón en Cafetería Ébenezer',
     label: 'Pizza',
-    caption: 'Masa crujiente, pepperoni y jamón generoso',
+    caption: 'Pepperoni y jamón. Para cuando la noche pide más.',
     index: '10',
   },
 ];
@@ -359,15 +359,15 @@ export default function GaleriaPage() {
       `}</style>
 
       <section className="gallery-hero">
-        <div className="eyebrow center reveal">La galería</div>
+        <div className="eyebrow center reveal">Lo que encontrarás</div>
         <h1 className="reveal reveal-delay-1">
-          Momentos que
+          Nuestros platos,
           <br />
-          <em>nos definen</em>
+          <em>nuestro local</em>
         </h1>
         <p className="reveal reveal-delay-2">
-          Una selección de instantes dentro de Ébenezer. Luz cálida, manos atareadas,
-          platos que pasan, miradas cómplices. Lo que somos, en imágenes.
+          Cafés, tostas, brunch y pizza. Sin filtros. Así es Ébenezer cada día.
+          Ven a verlo en persona.
         </p>
       </section>
 
@@ -411,12 +411,12 @@ export default function GaleriaPage() {
       </section>
 
       <section className="gallery-footer">
-        <div className="eyebrow center reveal">La mejor imagen</div>
+        <div className="eyebrow center reveal">¿Te ha entrado hambre?</div>
         <h2 className="reveal reveal-delay-1">
-          ...es la que haces <em>en persona</em>
+          Ven hoy. <em>Reserva tu mesa.</em>
         </h2>
         <Link href="/contacto" className="lux-btn reveal reveal-delay-2">
-          <span>Reserva tu visita</span>
+          <span>Reservar ahora</span>
           <svg viewBox="0 0 24 24">
             <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
