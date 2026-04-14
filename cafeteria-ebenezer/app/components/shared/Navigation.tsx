@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { SITE } from '@/lib/config/site';
 
@@ -111,6 +112,22 @@ export default function Navigation() {
           text-align: center;
           transition: color 0.4s var(--ease-silk);
           text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.55rem;
+        }
+        .nav-logo-img {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 1px solid rgba(201, 169, 110, 0.35);
+          flex-shrink: 0;
+          transition: border-color 0.4s var(--ease-silk);
+        }
+        .nav-logo:hover .nav-logo-img {
+          border-color: var(--champagne);
         }
         .nav-logo-bracket {
           color: var(--champagne);
@@ -452,6 +469,13 @@ export default function Navigation() {
             </span>
           </div>
           <Link href="/inicio" className="nav-logo" onClick={closeMenu}>
+            <Image
+              src="https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.21_3_vigfru.jpg"
+              alt="Logo Cafetería Ébenezer"
+              width={36}
+              height={36}
+              className="nav-logo-img"
+            />
             Ébenezer
           </Link>
           <div className="nav-right">

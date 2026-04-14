@@ -27,9 +27,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Cafetería Ébenezer" }],
   creator: "Cafetería Ébenezer",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171811/favicon_avmzwi.png",
+    shortcut: "https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171811/favicon_avmzwi.png",
+    apple: "https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171811/favicon_avmzwi.png",
   },
   openGraph: {
     type: "website",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: "Cafetería Ébenezer",
     images: [
       {
-        url: "/file.svg",
+        url: "https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.21_3_vigfru.jpg",
         width: 1200,
         height: 630,
         alt: "Cafetería Ébenezer — Café de día, pizza de noche",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     title: "Ébenezer · Café de día, pizza de noche",
     description:
       "Café de especialidad y pizzas artesanales en Valdepeñas. Una experiencia gastronómica única.",
-    images: ["/file.svg"],
+    images: ["https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.21_3_vigfru.jpg"],
   },
   robots: {
     index: true,
@@ -77,7 +77,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Restaurant",
     name: "Cafetería Ébenezer",
-    image: `${baseUrl}/file.svg`,
+    image: "https://res.cloudinary.com/dphq9ymvo/image/upload/v1776171742/WhatsApp_Image_2026-04-03_at_11.33.21_3_vigfru.jpg",
     description:
       "Cafetería de especialidad y pizzería artesanal en Valdepeñas. Café de día, pizza de noche.",
     address: {
