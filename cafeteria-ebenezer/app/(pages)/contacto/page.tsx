@@ -393,10 +393,48 @@ export default function ContactoPage() {
             gap: 0;
           }
           .map-wrap {
-            height: 400px;
+            height: 380px;
           }
           .reservation-form {
             padding: 1.75rem;
+          }
+        }
+        @media (max-width: 768px) {
+          .map-wrap {
+            height: 320px;
+          }
+          .contact-cell {
+            padding: 2.5rem 2rem;
+          }
+          .reservation-form {
+            padding: 1.5rem;
+          }
+          .contact-grid {
+            padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 4rem);
+          }
+          .contact-main {
+            padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 4rem);
+          }
+        }
+        @media (max-width: 480px) {
+          .map-wrap {
+            height: 260px;
+          }
+          .contact-cell {
+            padding: 2rem 1.25rem;
+          }
+          .contact-cell-value {
+            font-size: 1rem;
+          }
+          .reservation-form {
+            padding: 1.25rem 1rem;
+          }
+          .contact-hero {
+            padding: clamp(4rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 4vw, 3rem);
+          }
+          .map-pin-label {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.75rem;
           }
         }
       `}</style>

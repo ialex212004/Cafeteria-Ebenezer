@@ -482,10 +482,10 @@ export default function InicioPage() {
             height: auto;
           }
           .hero-panel {
-            min-height: 62vh;
+            min-height: 58vh;
           }
           .hero-content {
-            padding: 3rem 2rem 3.5rem;
+            padding: 2.5rem 2rem 3rem;
           }
           .hero-divider {
             display: none;
@@ -510,6 +510,64 @@ export default function InicioPage() {
           }
           .invitation {
             background-attachment: scroll;
+          }
+        }
+        @media (max-width: 600px) {
+          .hero-panel {
+            min-height: 50vh;
+          }
+          .hero-content {
+            padding: 2rem 1.5rem 2.5rem;
+            max-width: 100%;
+          }
+          .hero-title {
+            font-size: clamp(2.2rem, 8vw, 2.8rem);
+            margin-bottom: 1.25rem;
+          }
+          .hero-sub {
+            font-size: 0.88rem;
+            margin-bottom: 2rem;
+          }
+          .hero-meta {
+            padding: 0.75rem 1.5rem 1.75rem;
+            font-size: 0.52rem;
+          }
+          .philosophy {
+            padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 4vw, 4rem);
+          }
+          .pillars {
+            padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 4vw, 4rem);
+          }
+          .pillars-header {
+            margin-bottom: 3rem;
+          }
+          .pillar {
+            padding: 2.5rem 1.5rem;
+          }
+          .invitation {
+            padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 4vw, 4rem);
+          }
+        }
+        @media (max-width: 400px) {
+          .hero-panel {
+            min-height: 46vh;
+          }
+          .hero-content {
+            padding: 1.75rem 1.25rem 2rem;
+          }
+          .hero-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+          }
+          .hero-sub {
+            font-size: 0.85rem;
+            line-height: 1.7;
+          }
+          .hero-index {
+            margin-bottom: 1.25rem;
+          }
+          .hero-tag {
+            margin-bottom: 1rem;
           }
         }
       `}</style>

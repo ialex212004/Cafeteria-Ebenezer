@@ -376,6 +376,7 @@ export default function MenuPage() {
           }
           .menu-item-price {
             padding-left: 0;
+            font-size: 1.15rem;
           }
           .menu-category-head {
             flex-direction: column;
@@ -384,6 +385,42 @@ export default function MenuPage() {
           .menu-tab {
             padding: 0.9rem 1.6rem;
             font-size: 0.58rem;
+          }
+          .menu-hero {
+            padding: clamp(4rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 5vw, 3rem);
+          }
+          .menu-body {
+            padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 4rem) clamp(4rem, 8vw, 7rem);
+          }
+          .menu-item:hover {
+            padding-left: 0;
+          }
+          .menu-item-desc {
+            max-width: 100%;
+          }
+        }
+        @media (max-width: 480px) {
+          .menu-tabs-wrap {
+            padding: clamp(2rem, 5vw, 3rem) 1.25rem 0.75rem;
+          }
+          .menu-tab {
+            padding: 0.85rem 1.4rem;
+            font-size: 0.56rem;
+          }
+          .menu-tab small {
+            font-size: 0.8rem;
+          }
+          .menu-category-num {
+            font-size: 1.8rem;
+          }
+          .menu-item {
+            padding: 1.25rem 0;
+          }
+          .menu-item-name h4 {
+            font-size: 1.05rem;
+          }
+          .menu-category {
+            margin-bottom: 3.5rem;
           }
         }
       `}</style>

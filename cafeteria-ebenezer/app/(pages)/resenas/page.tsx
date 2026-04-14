@@ -448,6 +448,47 @@ export default function ResenasPage() {
             padding: 1.75rem;
           }
         }
+        @media (max-width: 768px) {
+          .res-card {
+            width: clamp(260px, 82vw, 300px);
+          }
+          .res-stars-picker button {
+            padding: 0.35rem;
+            font-size: 1.75rem;
+          }
+          .res-pause {
+            font-size: 0.54rem;
+          }
+        }
+        @media (max-width: 600px) {
+          .res-score {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            padding: 1.5rem 1.5rem;
+          }
+          .res-score-meta {
+            border-left: none;
+            border-top: 1px solid var(--border-hair);
+            padding-left: 0;
+            padding-top: 1rem;
+            text-align: center;
+          }
+          .res-form {
+            padding: 1.5rem 1.25rem;
+          }
+          .res-form-section {
+            padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 4rem);
+          }
+        }
+        @media (max-width: 400px) {
+          .res-card {
+            width: 86vw;
+          }
+          .res-hero {
+            padding: clamp(4rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 4vw, 3rem);
+          }
+        }
       `}</style>
 
       <section className="res-hero">

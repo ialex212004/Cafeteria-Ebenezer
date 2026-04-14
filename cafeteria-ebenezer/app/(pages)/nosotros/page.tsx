@@ -349,6 +349,9 @@ export default function NosotrosPage() {
           .story-accent {
             display: none;
           }
+          .chronicle-header {
+            margin-bottom: 3.5rem;
+          }
         }
         @media (max-width: 600px) {
           .chronicle-grid {
@@ -357,13 +360,39 @@ export default function NosotrosPage() {
           .chronicle-slot {
             border-right: none;
             border-bottom: 1px solid var(--border-hair);
+            padding: 2rem 1.5rem;
           }
           .chronicle-slot:last-child {
             border-bottom: none;
           }
+          .chronicle-header {
+            margin-bottom: 2.5rem;
+          }
           .value-row {
             grid-template-columns: 1fr;
             gap: 0.5rem;
+            padding: 1.75rem 0;
+          }
+          .story-text p:first-of-type::first-letter {
+            font-size: 2.8rem;
+            padding-right: 0.4rem;
+          }
+          .story-signature {
+            gap: 1rem;
+          }
+          .values-inner {
+            gap: 2.5rem;
+          }
+        }
+        @media (max-width: 400px) {
+          .chronicle-slot {
+            padding: 1.75rem 1.25rem;
+          }
+          .chronicle-time {
+            font-size: 1.8rem;
+          }
+          .value-row {
+            padding: 1.5rem 0;
           }
         }
       `}</style>
@@ -407,13 +436,13 @@ export default function NosotrosPage() {
               <em>de la fe y las manos</em>
             </h2>
             <p className="reveal reveal-delay-2">
-              Esta cafetería nació del corazón de una mujer que creyó que Dios podía usarla
-              incluso entre fogones y tazas de café. No fue fácil. Hubo madrugadas de duda,
+              Esta cafetería nació del corazón de un matrimonio cubano que creyó que Dios podía usarlos
+              incluso entre hornos y tazas de café. No fue fácil. Hubo madrugadas de duda,
               momentos en los que el camino no estaba claro. Pero había una roca firme debajo
               de cada paso: la convicción de que esto no era solo un negocio, sino un llamado.
             </p>
             <p className="reveal reveal-delay-2">
-              Ébenezer abrió sus puertas en Valdepeñas no para ser la cafetería más famosa,
+              Cafeteria Ébenezer abrió sus puertas en Valdepeñas no para ser la cafetería más famosa,
               sino para ser la más fiel. Fiel al producto, fiel a las personas que entran,
               y sobre todo, fiel a quien nos sostuvo cuando todavía era solo un sueño escrito
               en un cuaderno.
@@ -425,7 +454,7 @@ export default function NosotrosPage() {
             <div className="story-signature reveal reveal-delay-3">
               <div>
                 <div className="story-signature-name">La familia Ébenezer</div>
-                <div className="story-signature-role">Fundadora · Valdepeñas · MMXXV</div>
+                <div className="story-signature-role">Fundadores | Angel Willian Lared Quintero | Dayamila Rodriguez Pacheco · Valdepeñas · MMXXV</div>
               </div>
             </div>
           </div>

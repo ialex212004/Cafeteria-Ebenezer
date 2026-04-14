@@ -355,6 +355,38 @@ export default function GaleriaPage() {
           .gal-card-title {
             font-size: 1.2rem;
           }
+          .gal-nav-btn {
+            width: 3.6rem;
+            height: 3.6rem;
+          }
+          .gal-nav-btn svg {
+            width: 18px;
+            height: 18px;
+          }
+          .gallery-nav {
+            gap: 2rem;
+            padding: 1.75rem;
+          }
+          .gallery-track {
+            padding: 0 clamp(1rem, 6vw, 6vw);
+          }
+        }
+        @media (max-width: 480px) {
+          .gal-card {
+            width: 88vw;
+          }
+          .gallery-track {
+            padding: 0 clamp(0.75rem, 4vw, 4vw);
+          }
+          .gallery-hero {
+            padding: clamp(4rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 4vw, 3rem);
+          }
+          .gallery-footer {
+            padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 4rem);
+          }
+          .gal-card-overlay {
+            padding: 1.5rem 1.25rem 1.25rem;
+          }
         }
       `}</style>
 

@@ -444,6 +444,37 @@ export default function Navigation() {
           .overlay-eyebrow {
             margin-bottom: 1.5rem;
           }
+          .menu-content {
+            padding: clamp(5rem, 10vh, 7rem) clamp(1.5rem, 6vw, 6vw) 2.5rem;
+          }
+        }
+        @media (max-width: 480px) {
+          .menu-content {
+            padding: 4.5rem 1.5rem 2rem;
+            justify-content: flex-start;
+            padding-top: max(4.5rem, calc(var(--stack) + 1.5rem));
+          }
+          .overlay-nav-link {
+            font-size: 1.75rem;
+            padding: 0.15rem 0;
+          }
+          .overlay-nav-item {
+            padding: 0.15rem 0;
+          }
+          .overlay-eyebrow {
+            font-size: 0.56rem;
+            margin-bottom: 1.2rem;
+          }
+          .overlay-bottom {
+            padding-top: 1.25rem;
+            gap: 1rem;
+          }
+          .overlay-address {
+            font-size: 0.72rem;
+          }
+          .overlay-center {
+            font-size: 1.2rem;
+          }
         }
       `}</style>
 

@@ -174,10 +174,29 @@ export default function Footer() {
         @media (max-width: 600px) {
           .footer-top {
             grid-template-columns: 1fr;
+            gap: 2rem;
           }
           .footer-bottom {
             flex-direction: column;
             text-align: center;
+            align-items: center;
+          }
+          .footer-legal {
+            gap: 1.2rem;
+          }
+        }
+        @media (max-width: 480px) {
+          footer {
+            padding: clamp(3rem, 8vw, 5rem) clamp(1.25rem, 4vw, 4rem) 2rem;
+          }
+          .footer-brand .logo {
+            font-size: 1.8rem;
+          }
+          .footer-col h4 {
+            margin-bottom: 1rem;
+          }
+          .footer-col ul li {
+            margin-bottom: 0.7rem;
           }
         }
       `}</style>
