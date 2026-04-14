@@ -206,7 +206,7 @@ const SPLASH_CSS = `
   }
 `;
 
-const LETTERS = Array.from('ÉBENEZER');
+const LETTERS = Array.from('CAFETERIA EBENEZER');
 
 export default function SplashScreen() {
   const [exiting, setExiting] = useState(false);
@@ -276,10 +276,10 @@ export default function SplashScreen() {
         role="presentation"
       >
         <div className="spl__inner">
-          <p className="spl__eyebrow">Est · MMXXV</p>
+          <p className="spl__eyebrow">BIENVENID@</p>
 
-          {/* aria-label en el h1 para que los lectores lean "Ébenezer" una sola vez */}
-          <h1 className="spl__title" aria-label="Ébenezer">
+          {/* aria-label en el h1 para que los lectores lean "Cafetería Ébenezer" una sola vez */}
+          <h1 className="spl__title" aria-label="Cafetería Ébenezer">
             {LETTERS.map((ch, i) => (
               <span
                 key={i}
