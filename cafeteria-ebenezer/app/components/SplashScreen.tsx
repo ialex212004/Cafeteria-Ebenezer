@@ -103,9 +103,16 @@ const SPLASH_CSS = `
     font-family: 'Italiana', 'Cormorant Garamond', serif;
     font-size: clamp(3.8rem, 9.5vw, 7.4rem);
     font-weight: 400;
-    color: #f6eedd;
-    line-height: 0.95;
+    color: #ffffff;
+    line-height: 0.92;
     letter-spacing: 0.025em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.08em;
+    text-shadow: 0 2px 32px rgba(201,169,110,0.18);
+  }
+  .spl__title-line {
     display: flex;
     gap: 0.01em;
   }
@@ -206,7 +213,8 @@ const SPLASH_CSS = `
   }
 `;
 
-const LETTERS = Array.from('CAFETERIA EBENEZER');
+const LINE1 = Array.from('CAFETERIA');
+const LINE2 = Array.from('EBENEZER');
 
 export default function SplashScreen() {
   const [exiting, setExiting] = useState(false);
@@ -280,15 +288,28 @@ export default function SplashScreen() {
 
           {/* aria-label en el h1 para que los lectores lean "Cafetería Ébenezer" una sola vez */}
           <h1 className="spl__title" aria-label="Cafetería Ébenezer">
-            {LETTERS.map((ch, i) => (
-              <span
-                key={i}
-                aria-hidden="true"
-                style={{ animationDelay: `${0.20 + i * 0.062}s` }}
-              >
-                {ch}
-              </span>
-            ))}
+            <div className="spl__title-line">
+              {LINE1.map((ch, i) => (
+                <span
+                  key={`l1-${i}`}
+                  aria-hidden="true"
+                  style={{ animationDelay: `${0.20 + i * 0.062}s` }}
+                >
+                  {ch}
+                </span>
+              ))}
+            </div>
+            <div className="spl__title-line">
+              {LINE2.map((ch, i) => (
+                <span
+                  key={`l2-${i}`}
+                  aria-hidden="true"
+                  style={{ animationDelay: `${0.20 + (LINE1.length + 1 + i) * 0.062}s` }}
+                >
+                  {ch}
+                </span>
+              ))}
+            </div>
           </h1>
 
           <div className="spl__rule" aria-hidden="true" />

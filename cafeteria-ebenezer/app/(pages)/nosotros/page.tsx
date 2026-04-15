@@ -418,12 +418,12 @@ export default function NosotrosPage() {
           <div className="story-media reveal">
             <div className="story-frame">
               <Image
-                src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=900&q=85"
-                alt="Interior de Cafetería Ébenezer con barra y ambiente cálido"
+                src="https://res.cloudinary.com/dphq9ymvo/image/upload/v1776240761/WhatsApp_Image_2026-04-15_at_09.51.08_bdiuat.jpg"
+                alt="Angel Willian y Dayamila, fundadores de Cafetería Ébenezer"
                 fill
                 sizes="(max-width: 900px) 100vw, 42vw"
               />
-              <div className="story-caption">— Valdepeñas · Ébenezer · MMXXV —</div>
+              <div className="story-caption">— Los fundadores · Ébenezer · MMXXV —</div>
             </div>
             <div className="story-accent" />
           </div>
