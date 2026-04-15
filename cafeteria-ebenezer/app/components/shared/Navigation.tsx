@@ -476,14 +476,38 @@ export default function Navigation() {
             font-size: 1.2rem;
           }
         }
-        @media (max-width: 360px) {
+        @media (max-width: 390px) {
           .menu-content {
-            padding-top: max(4rem, calc(var(--stack) + 1rem));
+            padding-top: max(4rem, calc(var(--stack) + 1.25rem));
             padding-left: 1.25rem;
             padding-right: 1.25rem;
           }
           .overlay-nav-link {
-            font-size: 1.55rem;
+            font-size: 1.6rem;
+            /* Asegurar objetivo táctil mínimo de 44px por línea */
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+          }
+          .overlay-eyebrow {
+            font-size: 0.52rem;
+            margin-bottom: 1rem;
+          }
+          .overlay-bottom {
+            padding-top: 1.1rem;
+          }
+          .overlay-center {
+            font-size: 1.1rem;
+          }
+        }
+        @media (max-width: 360px) {
+          .menu-content {
+            padding-top: max(3.75rem, calc(var(--stack) + 1rem));
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+          .overlay-nav-link {
+            font-size: 1.45rem;
           }
           .overlay-eyebrow {
             display: none;

@@ -388,6 +388,36 @@ export default function GaleriaPage() {
             padding: 1.5rem 1.25rem 1.25rem;
           }
         }
+        /* ── 390px: tarjetas casi pantalla completa ── */
+        @media (max-width: 390px) {
+          .gal-card {
+            width: 91vw;
+          }
+          .gallery-track {
+            padding: 0 clamp(0.5rem, 3vw, 1.5rem);
+          }
+          .gal-nav-counter {
+            font-size: 0.9rem;
+            min-width: 55px;
+          }
+          .gal-nav-counter b {
+            font-size: 1.3rem;
+          }
+          .gal-nav-btn {
+            width: 3rem;
+            height: 3rem;
+          }
+          .gallery-nav {
+            gap: 1.5rem;
+            padding: 1.25rem;
+          }
+          .gal-card-title {
+            font-size: 1.1rem;
+          }
+          .gal-card-overlay {
+            padding: 1.25rem 1rem 1rem;
+          }
+        }
       `}</style>
 
       <section className="gallery-hero">

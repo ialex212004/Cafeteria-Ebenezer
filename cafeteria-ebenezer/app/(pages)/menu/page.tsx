@@ -423,6 +423,38 @@ export default function MenuPage() {
             margin-bottom: 3.5rem;
           }
         }
+        /* ── 390px: tabs apretados en iPhone SE ── */
+        @media (max-width: 390px) {
+          .menu-tabs-wrap {
+            padding: clamp(1.75rem, 5vw, 2.5rem) 1rem 0.75rem;
+          }
+          .menu-tab {
+            padding: 0.8rem 1.1rem;
+            font-size: 0.54rem;
+            letter-spacing: 0.22em;
+          }
+          .menu-tab small {
+            font-size: 0.75rem;
+          }
+          .menu-item-name h4 {
+            font-size: 1rem;
+          }
+          .menu-item-desc {
+            font-size: 0.82rem;
+          }
+          .menu-item-price {
+            font-size: 1.05rem;
+          }
+          .menu-body {
+            padding: clamp(1.5rem, 4vw, 3rem) 1rem clamp(3rem, 7vw, 5rem);
+          }
+          .menu-category-num {
+            font-size: 1.6rem;
+          }
+          .menu-category-title {
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
+          }
+        }
       `}</style>
 
       <section className="menu-hero">

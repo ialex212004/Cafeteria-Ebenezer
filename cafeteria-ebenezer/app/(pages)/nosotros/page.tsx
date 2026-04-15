@@ -353,14 +353,22 @@ export default function NosotrosPage() {
             margin-bottom: 3.5rem;
           }
         }
-        @media (max-width: 600px) {
+        /* ── 768px: columna única en chronicle ─────────────────────────────
+           A 2 columnas con palabras largas como "Familia" en Cormorant
+           2.4rem, cada celda tiene ~180px de contenido útil → texto justo.
+           Pasamos a 1 columna para garantizar legibilidad y evitar overflow.
+        ──────────────────────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
           .chronicle-grid {
             grid-template-columns: 1fr;
           }
           .chronicle-slot {
             border-right: none;
             border-bottom: 1px solid var(--border-hair);
-            padding: 2rem 1.5rem;
+            padding: 2.5rem 1.75rem;
+          }
+          .chronicle-slot:nth-child(2) {
+            border-bottom: 1px solid var(--border-hair);
           }
           .chronicle-slot:last-child {
             border-bottom: none;
@@ -382,6 +390,15 @@ export default function NosotrosPage() {
           }
           .values-inner {
             gap: 2.5rem;
+          }
+        }
+        @media (max-width: 600px) {
+          /* Hereda 1 columna del breakpoint 768px */
+          .chronicle-slot {
+            padding: 2rem 1.5rem;
+          }
+          .chronicle-time {
+            font-size: 2rem;
           }
         }
         @media (max-width: 400px) {

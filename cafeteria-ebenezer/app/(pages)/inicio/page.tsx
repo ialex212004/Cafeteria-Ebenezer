@@ -570,6 +570,69 @@ export default function InicioPage() {
             margin-bottom: 0.85rem;
           }
         }
+        /* ── Breakpoint 480px: teléfonos medianos ── */
+        @media (max-width: 480px) {
+          /* Canvas de partículas: mantener dentro del viewport, no scroll */
+          .hero-bg-canvas {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+          }
+          .hero-panel {
+            min-height: 42vh;
+          }
+          .hero-content {
+            padding: 1.5rem 1rem 2rem;
+          }
+          .hero-title {
+            font-size: clamp(1.9rem, 7.5vw, 2.4rem);
+            margin-bottom: 1rem;
+          }
+          .hero-sub {
+            font-size: 0.84rem;
+            max-width: 100%;
+            margin-bottom: 1.5rem;
+          }
+          .hero-cta {
+            font-size: 0.58rem;
+          }
+          .hero-index {
+            margin-bottom: 0.85rem;
+          }
+          .hero-tag {
+            margin-bottom: 1rem;
+          }
+          .philosophy {
+            padding: clamp(3.5rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem);
+          }
+          .philosophy-quote {
+            font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+          }
+          .pillar {
+            padding: 2rem 1rem;
+          }
+          .invitation {
+            padding: clamp(3.5rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem);
+          }
+        }
+
+        /* ── Breakpoint 390px: iPhone SE / pantallas pequeñas ── */
+        @media (max-width: 390px) {
+          .hero-panel {
+            min-height: 38vh;
+          }
+          .hero-content {
+            padding: 1.25rem 1rem 1.5rem;
+          }
+          .hero-title {
+            font-size: 1.75rem;
+          }
+          .hero-meta {
+            font-size: 0.48rem;
+            padding: 0.5rem 1rem 1rem;
+          }
+        }
+
         /* Desactivar expand/shrink en dispositivos táctiles */
         @media (hover: none) {
           .hero-panel.expanded,

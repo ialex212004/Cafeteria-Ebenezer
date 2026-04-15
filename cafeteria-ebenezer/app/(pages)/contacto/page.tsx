@@ -437,6 +437,32 @@ export default function ContactoPage() {
             padding: 0.4rem 0.75rem;
           }
         }
+        /* ── 360-390px: pantallas muy pequeñas ── */
+        @media (max-width: 390px) {
+          .map-wrap {
+            height: 220px;
+          }
+          .contact-cell {
+            padding: 1.5rem 1rem;
+          }
+          .contact-cell-value {
+            font-size: 0.95rem;
+          }
+          .reservation-form {
+            padding: 1rem 0.75rem;
+          }
+          .contact-main {
+            padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 3vw, 3rem);
+          }
+          .contact-grid {
+            padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 3vw, 3rem);
+          }
+          .map-pin-label {
+            font-size: 0.68rem;
+            padding: 0.35rem 0.6rem;
+            letter-spacing: 0.1em;
+          }
+        }
       `}</style>
 
       <section className="contact-hero">

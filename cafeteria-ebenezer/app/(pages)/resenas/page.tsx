@@ -481,6 +481,12 @@ export default function ResenasPage() {
           .res-pause {
             font-size: 0.54rem;
           }
+          /* Reducir el fade lateral del carrusel en pantallas pequeñas:
+             10% de 768px = 76px ocultos → reducimos a 6% = 46px */
+          .res-carousel {
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+          }
         }
         @media (max-width: 600px) {
           .res-score {
@@ -503,12 +509,33 @@ export default function ResenasPage() {
             padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 4rem);
           }
         }
+        @media (max-width: 480px) {
+          /* En pantallas muy pequeñas el fade de 6% = 23px → reducir más */
+          .res-carousel {
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+          }
+          .res-hero h1 {
+            font-size: clamp(2.2rem, 8vw, 3rem);
+          }
+          .res-form {
+            padding: 1.5rem 1rem;
+          }
+        }
         @media (max-width: 400px) {
           .res-card {
             width: 86vw;
           }
           .res-hero {
             padding: clamp(4rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 4vw, 3rem);
+          }
+        }
+        @media (max-width: 390px) {
+          .res-card {
+            width: 90vw;
+          }
+          .res-card-text {
+            font-size: 0.85rem;
           }
         }
       `}</style>

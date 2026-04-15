@@ -55,6 +55,9 @@
 html {
   scroll-behavior: smooth;
   background: var(--obsidian);
+  /* Previene scroll horizontal en cualquier pantalla */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -361,6 +364,28 @@ h6 {
     font-size: 0.62rem;
     letter-spacing: 0.22em;
     gap: 0.75rem;
+  }
+}
+
+/* ── Breakpoint 390px: iPhone SE / pequeños Android ── */
+@media (max-width: 390px) {
+  :root {
+    --nav-h: 60px;
+    --info-h: 28px;
+  }
+  .section {
+    padding: 3.5rem 1rem;
+  }
+  .display-title {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+  }
+  .section-title {
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+  .lux-btn {
+    font-size: 0.6rem;
+    padding: 0.85rem 1.4rem;
+    letter-spacing: 0.2em;
   }
 }
 
